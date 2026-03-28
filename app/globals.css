@@ -1,1 +1,21 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --color-brand: #1D9E75;
+  --color-brand-dark: #0F6E56;
+  --color-brand-light: #E1F5EE;
+  --color-surface: #F4F4F2;
+  --color-border: #DDDDDD;
+  --color-text: #2d2d3a;
+  --color-text-muted: #6b7280;
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --radius-card: 12px;
+  --radius-btn: 8px;
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.08);
+}
+
+body {
+  color: var(--color-text);
+  background: #fffcf9;
+}
