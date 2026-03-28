@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 const directoryLinks = [
@@ -19,9 +20,13 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="md:col-span-1">
-            <Link href="/" className="text-xl font-bold">
-              <span className="text-brand">British</span>
-              <span className="text-white">Lookup</span>
+            <Link href="/" className="inline-block">
+              <Image
+                src="/British-Lookup-Logo-Secondary.svg"
+                alt="British Lookup"
+                width={160}
+                height={40}
+              />
             </Link>
             <p className="mt-3 text-sm text-gray-400 leading-relaxed">
               The UK&apos;s trusted business directory. Find verified tradespeople,

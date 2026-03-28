@@ -12,6 +12,11 @@ export const baseMetadata: Metadata = {
     template: `%s | ${SITE_NAME}`,
   },
   description: DEFAULT_DESC,
+  icons: {
+    icon: "/British-Lookup-Favicon.svg",
+    shortcut: "/British-Lookup-Favicon.svg",
+    apple: "/British-Lookup-Favicon.svg",
+  },
   openGraph: {
     type: "website",
     siteName: SITE_NAME,
