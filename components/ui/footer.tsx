@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 
 const directoryLinks = [
@@ -21,11 +20,11 @@ export function Footer() {
           {/* Brand */}
           <div className="md:col-span-1">
             <Link href="/" className="inline-block">
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src="/British-Lookup-Logo-Secondary.svg"
                 alt="British Lookup"
-                width={160}
-                height={40}
+                className="h-10 w-auto"
               />
             </Link>
             <p className="mt-3 text-sm text-gray-400 leading-relaxed">
