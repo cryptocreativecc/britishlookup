@@ -1,0 +1,47 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      - POCKETBASE_URL=${POCKETBASE_URL}
+      - POCKETBASE_ADMIN_EMAIL=${POCKETBASE_ADMIN_EMAIL}
+      - POCKETBASE_ADMIN_PASSWORD=${POCKETBASE_ADMIN_PASSWORD}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - REVALIDATION_SECRET=${REVALIDATION_SECRET}
+    networks:
+      - internal
+      - dokploy-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.britishlookup.entrypoints=websecure"
+      - "traefik.http.routers.britishlookup.rule=Host(`britishlookup.co.uk`)"
+      - "traefik.http.routers.britishlookup.tls=true"
+      - "traefik.http.routers.britishlookup.tls.certresolver=letsencrypt"
+      - "traefik.http.services.britishlookup.loadbalancer.server.port=3000"
+
+  pocketbase:
+    image: ghcr.io/muchobien/pocketbase:latest
+    restart: unless-stopped
+    volumes:
+      - pb_data:/pb/pb_data
+      - pb_public:/pb/pb_public
+    networks:
+      - internal
+      - dokploy-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.britishlookup-pb.entrypoints=websecure"
+      - "traefik.http.routers.britishlookup-pb.rule=Host(`pb.britishlookup.co.uk`)"
+      - "traefik.http.routers.britishlookup-pb.tls=true"
+      - "traefik.http.routers.britishlookup-pb.tls.certresolver=letsencrypt"
+      - "traefik.http.services.britishlookup-pb.loadbalancer.server.port=8090"
+
+networks:
+  dokploy-network:
+    external: true
+  internal:
+
+volumes:
+  pb_data:
+  pb_public:

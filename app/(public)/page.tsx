@@ -3,6 +3,7 @@ import { SearchBar } from "@/components/ui/search-bar";
 import { Button } from "@/components/ui/button";
 import { BusinessCard } from "@/components/directory/business-card";
 import { ArticleCard } from "@/components/blog/article-card";
+import { websiteJsonLd, organizationJsonLd } from "@/lib/jsonld";
 
 const PLACEHOLDER_BUSINESSES = [
   { name: "Thompson Roofing", slug: "thompson-roofing", category: "Roofing", town: "Manchester", description: "Professional roofing services across Greater Manchester. Flat roofs, pitched roofs, repairs and maintenance.", isFeatured: true, isVerified: true },
@@ -27,6 +28,9 @@ const STATS = [
 export default function HomePage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd()) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd()) }} />
+
       {/* Hero */}
       <section className="bg-gradient-to-b from-brand-light/50 to-white py-20 sm:py-28">
         <div className="max-w-4xl mx-auto px-4 text-center">
