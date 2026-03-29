@@ -12,6 +12,7 @@ export const businessSchema = z.object({
   phone: z.string().max(20).optional().or(z.literal("")),
   email: z.string().email("Enter a valid email address"),
   website: z.string().url("Enter a valid URL").or(z.literal("")),
+  anchor_text: z.string().max(100).optional().or(z.literal("")),
   description: z.string().min(20, "Description must be at least 20 characters").max(1200),
   tags: z.string().max(500).optional().or(z.literal("")),
 });

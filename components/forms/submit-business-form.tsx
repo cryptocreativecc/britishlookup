@@ -41,6 +41,7 @@ export function SubmitBusinessForm({ categories = [], regions = [], redirectTo }
     payload.set("phone", fd.get("phone") as string || "");
     payload.set("email", fd.get("email") as string || "");
     payload.set("website", fd.get("website") as string || "");
+    payload.set("anchor_text", fd.get("anchor_text") as string || "");
     payload.set("description", fd.get("description") as string || "");
     payload.set("tags", fd.get("tags") as string || "");
     
@@ -150,6 +151,9 @@ export function SubmitBusinessForm({ categories = [], regions = [], redirectTo }
       </div>
 
       <Field label="Website URL" name="website" placeholder="https://example.com" errors={errors.website} />
+
+      <Field label="Website Anchor Text" name="anchor_text" placeholder="e.g. Wigan Plumbing Services, Best Web Designer UK" errors={errors.anchor_text} />
+      <p className="-mt-4 text-xs text-text-muted">Keyword-relevant text for your website link (optional). If left empty, your domain name will be used.</p>
 
       <div>
         <label className="block text-sm font-medium text-text mb-1.5">Business Description *</label>

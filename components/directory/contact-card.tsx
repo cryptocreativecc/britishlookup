@@ -31,9 +31,10 @@ interface ContactCardProps {
   phone?: string;
   email?: string;
   website?: string;
+  anchorText?: string;
 }
 
-export function ContactCard({ address, town, postcode, phone, email, website }: ContactCardProps) {
+export function ContactCard({ address, town, postcode, phone, email, website, anchorText }: ContactCardProps) {
   const [unlocked, setUnlocked] = useState(false);
   const hasHidden = !!phone || !!email;
 
@@ -72,8 +73,12 @@ export function ContactCard({ address, town, postcode, phone, email, website }: 
         )}
 
         {website && (
-          <a href={website} target="_blank" rel="noopener noreferrer" className="mt-4 block">
-            <Button className="w-full">Visit Website</Button>
+          <a
+            href={website}
+            target="_blank"
+            className="mt-4 block"
+          >
+            <Button className="w-full">{anchorText || "Visit Website"}</Button>
           </a>
         )}
       </CardContent>
