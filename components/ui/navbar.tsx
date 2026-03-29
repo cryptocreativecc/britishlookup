@@ -17,8 +17,8 @@ export function NavBar() {
   const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
-    // Check if user has auth cookie (client-side hint)
-    setLoggedIn(document.cookie.includes("bl_auth="));
+    // Check for login hint cookie (non-httpOnly)
+    setLoggedIn(document.cookie.includes("bl_logged_in="));
   }, []);
 
   return (

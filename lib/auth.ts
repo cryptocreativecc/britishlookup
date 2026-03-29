@@ -28,11 +28,20 @@ export async function setAuthCookie(token: string) {
     path: "/",
     maxAge: MAX_AGE,
   });
+  // Non-httpOnly hint for client-side UI (navbar dashboard link)
+  jar.set("bl_logged_in", "1", {
+    httpOnly: false,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: MAX_AGE,
+  });
 }
 
 export async function clearAuthCookie() {
   const jar = await cookies();
   jar.delete(COOKIE_NAME);
+  jar.delete("bl_logged_in");
 }
 
 export async function getAuth(): Promise<AuthResult | null> {
@@ -63,6 +72,7 @@ export async function getAuth(): Promise<AuthResult | null> {
     // Token expired or invalid
     const delJar = await cookies();
     delJar.delete(COOKIE_NAME);
+    delJar.delete("bl_logged_in");
     return null;
   }
 }
