@@ -1,55 +1,93 @@
+export const dynamic = "force-dynamic";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { createAdminPb } from "@/lib/pb";
+import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
-export async function generateMetadata(): Promise<Metadata> {
-  return { title: "Article — BritishLookup Blog" };
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const pb = await createAdminPb();
+  try {
+    const article = await pb.collection("articles").getFirstListItem(`slug="${slug}"`, { expand: "category" });
+    return {
+      title: article.seo_title || `${article.title} — BritishLookup Blog`,
+      description: article.seo_description || article.excerpt || article.body?.replace(/<[^>]*>/g, "").slice(0, 160),
+    };
+  } catch {
+    return { title: "Article — BritishLookup Blog" };
+  }
 }
 
-export default function ArticlePage() {
+export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const pb = await createAdminPb();
+
+  let article;
+  try {
+    article = await pb.collection("articles").getFirstListItem(`slug="${slug}"`, { expand: "category" });
+  } catch {
+    notFound();
+  }
+
+  const categoryName = article.expand?.category?.name || "";
+  const publishedAt = article.published_at || article.created;
+  const dateStr = publishedAt ? new Date(publishedAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) : "";
+  const coverUrl = article.cover_image
+    ? `https://pb.britishlookup.co.uk/api/files/articles/${article.id}/${article.cover_image}`
+    : "";
+
   return (
     <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <div className="flex items-center gap-2 mb-4">
-        <Badge variant="brand">Roofing</Badge>
-        <span className="text-sm text-text-muted">5 min read</span>
-        <span className="text-sm text-text-muted">· 25 March 2026</span>
+        {categoryName && <Badge variant="brand">{categoryName}</Badge>}
+        {article.read_time && <span className="text-sm text-text-muted">{article.read_time} min read</span>}
+        {dateStr && <span className="text-sm text-text-muted">· {dateStr}</span>}
       </div>
 
-      <h1 className="text-3xl sm:text-4xl font-bold text-text">
-        How to Choose a Reliable Roofer in 2026
-      </h1>
-      <p className="mt-3 text-lg text-text-muted">
-        Finding a trustworthy roofer doesn&apos;t have to be stressful. Here&apos;s what to look for and the questions to ask before hiring.
-      </p>
+      <h1 className="text-3xl sm:text-4xl font-bold text-text">{article.title}</h1>
 
-      <div className="mt-8 prose prose-lg max-w-none">
-        <p>When it comes to roofing work, choosing the right contractor can mean the difference between a job that lasts decades and one that causes problems within months. Here&apos;s our guide to finding a reliable roofer in the UK.</p>
-        <h2>Check credentials and insurance</h2>
-        <p>Any reputable roofer should be able to provide proof of public liability insurance and, ideally, membership of a recognised trade body such as the NFRC (National Federation of Roofing Contractors).</p>
-        <h2>Get multiple quotes</h2>
-        <p>Always get at least three written quotes for comparison. Be wary of any quote that seems significantly cheaper than the others — it often indicates corners will be cut.</p>
-        <p className="text-text-muted italic">This is a placeholder article. Real content will be loaded from PocketBase.</p>
-      </div>
+      {article.excerpt && (
+        <p className="mt-3 text-lg text-text-muted">{article.excerpt}</p>
+      )}
+
+      {coverUrl && (
+        <div className="mt-6 rounded-lg overflow-hidden border border-border">
+          <img src={coverUrl} alt={article.title} className="w-full h-auto object-cover" />
+        </div>
+      )}
+
+      <div
+        className="mt-8 prose prose-lg max-w-none post-content"
+        dangerouslySetInnerHTML={{ __html: article.body }}
+      />
 
       {/* Author bio */}
-      <Card className="mt-10">
-        <CardContent>
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-full bg-brand-light flex items-center justify-center text-brand font-bold">
-              BL
+      {(article.author_name || article.author_bio) && (
+        <Card className="mt-10">
+          <CardContent>
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-full bg-brand-light flex items-center justify-center text-brand font-bold shrink-0">
+                {(article.author_name || "A").charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <p className="font-semibold text-text">{article.author_name}</p>
+                {article.author_company && (
+                  <p className="text-sm text-text-muted">{article.author_company}</p>
+                )}
+                {article.author_bio && (
+                  <p className="text-sm text-text-muted mt-1">{article.author_bio}</p>
+                )}
+                {article.author_website && (
+                  <a href={article.author_website} target="_blank" rel="noopener" className="text-sm text-brand hover:text-brand-dark mt-1 inline-block">
+                    {article.author_website.replace(/^https?:\/\//, "").replace(/\/$/, "")}
+                  </a>
+                )}
+              </div>
             </div>
-            <div>
-              <p className="font-semibold text-text">BritishLookup Editorial</p>
-              <p className="text-sm text-text-muted mt-1">
-                The BritishLookup editorial team writes guides and insights to help UK homeowners find trusted tradespeople.
-              </p>
-              <a href="https://britishlookup.co.uk" className="text-sm text-brand hover:text-brand-dark mt-1 inline-block">
-                britishlookup.co.uk
-              </a>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
     </article>
   );
 }
