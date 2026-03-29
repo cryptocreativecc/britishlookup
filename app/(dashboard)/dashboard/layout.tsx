@@ -6,6 +6,7 @@ const sidebarLinks = [
   { href: "/dashboard", label: "Overview", icon: "📊" },
   { href: "/dashboard/listings", label: "My Listings", icon: "🏢" },
   { href: "/dashboard/posts", label: "My Posts", icon: "✍️" },
+  { href: "/dashboard/profile", label: "Profile", icon: "👤" },
 ];
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {

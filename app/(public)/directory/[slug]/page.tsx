@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ClaimButton } from "@/components/directory/claim-button";
+import { ReviewsSection } from "@/components/directory/reviews-section";
 import { createAdminPb } from "@/lib/pb";
 import { listingMeta } from "@/lib/seo";
 import { notFound } from "next/navigation";
@@ -87,6 +88,9 @@ export default async function ListingPage({
               <p>{biz.description}</p>
             )}
           </div>
+
+          {/* Reviews */}
+          <ReviewsSection businessId={biz.id} />
 
           {/* Claim section */}
           {!biz.claimed && (

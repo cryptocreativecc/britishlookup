@@ -1,21 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+
+const TipTapEditor = lazy(() =>
+  import("@/components/ui/tiptap-editor").then((m) => ({ default: m.TipTapEditor }))
+);
 
 export default function NewPostPage() {
   const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [body, setBody] = useState("");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (!body || body === "<p></p>") {
+      setError("Content is required");
+      return;
+    }
     setLoading(true);
     setError("");
 
     const form = new FormData(e.currentTarget);
+    form.set("body", body);
     try {
       const res = await fetch("/api/submit-article", {
         method: "POST",
@@ -50,13 +60,9 @@ export default function NewPostPage() {
 
             <div>
               <label className="block text-sm font-medium text-text mb-1.5">Content *</label>
-              <textarea
-                name="body"
-                required
-                rows={12}
-                className="w-full px-4 py-3 rounded-[var(--radius-btn)] border border-border bg-white text-text focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand"
-                placeholder="Write your article here..."
-              />
+              <Suspense fallback={<div className="h-[250px] border border-border rounded-lg animate-pulse bg-gray-50" />}>
+                <TipTapEditor onChange={setBody} />
+              </Suspense>
             </div>
 
             <div>

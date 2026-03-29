@@ -1,9 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+
+const TipTapEditor = lazy(() =>
+  import("@/components/ui/tiptap-editor").then((m) => ({ default: m.TipTapEditor }))
+);
 
 interface Props {
   post: {
@@ -21,6 +25,7 @@ export function EditPostForm({ post }: Props) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [body, setBody] = useState(post.body || "");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -29,6 +34,7 @@ export function EditPostForm({ post }: Props) {
     setSuccess(false);
 
     const form = new FormData(e.currentTarget);
+    form.set("body", body);
     try {
       const res = await fetch(`/api/articles/${post.id}/update`, {
         method: "POST",
@@ -63,13 +69,9 @@ export function EditPostForm({ post }: Props) {
             </div>
             <div>
               <label className="block text-sm font-medium text-text mb-1.5">Content</label>
-              <textarea
-                name="body"
-                defaultValue={post.body}
-                required
-                rows={12}
-                className="w-full px-4 py-3 rounded-[var(--radius-btn)] border border-border bg-white text-text focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand"
-              />
+              <Suspense fallback={<div className="h-[250px] border border-border rounded-lg animate-pulse bg-gray-50" />}>
+                <TipTapEditor content={post.body} onChange={setBody} />
+              </Suspense>
             </div>
             <div>
               <label className="block text-sm font-medium text-text mb-1.5">Bio</label>
