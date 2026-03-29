@@ -63,10 +63,6 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
       <h1 className="text-3xl sm:text-4xl font-bold text-text">{article.title}</h1>
 
-      {article.excerpt && (
-        <p className="mt-3 text-lg text-text-muted">{article.excerpt}</p>
-      )}
-
       {coverUrl && (
         <div className="mt-6 rounded-lg overflow-hidden border border-border">
           <img src={coverUrl} alt={article.title} className="w-full h-auto object-cover" />
