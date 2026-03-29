@@ -13,7 +13,7 @@ const staticRoutes = [
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // TODO: Fetch approved businesses and published articles from PocketBase
-  // const pb = getPB();
+  // const pb = createPb();
   // const businesses = await pb.collection("businesses").getFullList({ filter: 'status = "approved"' });
   // const articles = await pb.collection("articles").getFullList({ filter: 'status = "published"' });
 

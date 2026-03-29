@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 const links = [
@@ -14,6 +14,12 @@ const links = [
 
 export function NavBar() {
   const [open, setOpen] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  useEffect(() => {
+    // Check if user has auth cookie (client-side hint)
+    setLoggedIn(document.cookie.includes("bl_auth="));
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-border">
@@ -39,6 +45,31 @@ export function NavBar() {
                 {link.label}
               </Link>
             ))}
+            <div className="ml-2 pl-2 border-l border-border flex items-center gap-1">
+              {loggedIn ? (
+                <Link
+                  href="/dashboard"
+                  className="px-3 py-2 text-sm font-medium bg-brand text-white rounded-[var(--radius-btn)] hover:bg-brand-dark transition-colors"
+                >
+                  Dashboard
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="px-3 py-2 text-sm font-medium text-text-muted hover:text-brand transition-colors rounded-[var(--radius-btn)]"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="px-3 py-2 text-sm font-medium bg-brand text-white rounded-[var(--radius-btn)] hover:bg-brand-dark transition-colors"
+                  >
+                    Register
+                  </Link>
+                </>
+              )}
+            </div>
           </nav>
 
           {/* Mobile hamburger */}
@@ -61,7 +92,7 @@ export function NavBar() {
         <nav
           className={cn(
             "md:hidden overflow-hidden transition-all duration-300",
-            open ? "max-h-80 pb-4" : "max-h-0"
+            open ? "max-h-96 pb-4" : "max-h-0"
           )}
         >
           {links.map((link) => (
@@ -74,6 +105,34 @@ export function NavBar() {
               {link.label}
             </Link>
           ))}
+          <div className="mt-2 pt-2 border-t border-border">
+            {loggedIn ? (
+              <Link
+                href="/dashboard"
+                onClick={() => setOpen(false)}
+                className="block px-3 py-2.5 text-sm font-medium text-brand"
+              >
+                Dashboard
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  onClick={() => setOpen(false)}
+                  className="block px-3 py-2.5 text-sm font-medium text-text-muted hover:text-brand"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/register"
+                  onClick={() => setOpen(false)}
+                  className="block px-3 py-2.5 text-sm font-medium text-brand"
+                >
+                  Register
+                </Link>
+              </>
+            )}
+          </div>
         </nav>
       </div>
     </header>

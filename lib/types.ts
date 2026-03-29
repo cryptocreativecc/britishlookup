@@ -1,3 +1,17 @@
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: "user" | "business_owner" | "admin";
+  avatar: string;
+  verified: boolean;
+  verification_token: string;
+  reset_token: string;
+  reset_token_expiry: string;
+  created: string;
+  updated: string;
+}
+
 export interface Business {
   id: string;
   name: string;
@@ -17,16 +31,18 @@ export interface Business {
   status: "pending" | "approved" | "rejected" | "featured";
   is_verified: boolean;
   is_featured: boolean;
+  claimed: boolean;
+  owner: string;
   rating_avg: number;
   rating_count: number;
   lat: number;
   lng: number;
   created: string;
   updated: string;
-  // Expanded relations
   expand?: {
     category?: Category;
     region?: Region;
+    owner?: User;
   };
 }
 
@@ -37,6 +53,7 @@ export interface Article {
   excerpt: string;
   body: string;
   category: string;
+  author: string;
   author_name: string;
   author_bio: string;
   author_website: string;
@@ -52,6 +69,7 @@ export interface Article {
   updated: string;
   expand?: {
     category?: Category;
+    author?: User;
   };
 }
 
@@ -78,6 +96,20 @@ export interface Review {
   author_name: string;
   status: "pending" | "approved" | "rejected";
   created: string;
+}
+
+export interface Claim {
+  id: string;
+  business: string;
+  user: string;
+  status: "pending" | "approved" | "rejected";
+  message: string;
+  created: string;
+  updated: string;
+  expand?: {
+    business?: Business;
+    user?: User;
+  };
 }
 
 export interface BusinessSubmission {

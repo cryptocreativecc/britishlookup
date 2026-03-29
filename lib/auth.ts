@@ -1,68 +1,80 @@
-import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
+import { cookies } from "next/headers";
+import { createPb } from "./pb";
+import { redirect } from "next/navigation";
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
-  providers: [
-    Credentials({
-      name: "Admin Login",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
+const COOKIE_NAME = "bl_auth";
+const MAX_AGE = 7 * 24 * 60 * 60; // 7 days
+
+export interface AuthUser {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  avatar: string;
+  verified: boolean;
+}
+
+export interface AuthResult {
+  token: string;
+  user: AuthUser;
+}
+
+export async function setAuthCookie(token: string) {
+  const jar = await cookies();
+  jar.set(COOKIE_NAME, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: MAX_AGE,
+  });
+}
+
+export async function clearAuthCookie() {
+  const jar = await cookies();
+  jar.delete(COOKIE_NAME);
+}
+
+export async function getAuth(): Promise<AuthResult | null> {
+  const jar = await cookies();
+  const token = jar.get(COOKIE_NAME)?.value;
+  if (!token) return null;
+
+  const pb = createPb();
+  pb.authStore.save(token, null);
+
+  if (!pb.authStore.isValid) return null;
+
+  try {
+    const record = await pb.collection("users").authRefresh();
+    const user = record.record;
+    return {
+      token: record.token,
+      user: {
+        id: user.id,
+        name: user.name || "",
+        email: user.email || "",
+        role: user.role || "user",
+        avatar: user.avatar || "",
+        verified: user.verified || false,
       },
-      async authorize(credentials) {
-        const adminEmail = process.env.ADMIN_EMAIL;
-        const adminPassword = process.env.ADMIN_PASSWORD;
+    };
+  } catch {
+    // Token expired or invalid
+    const delJar = await cookies();
+    delJar.delete(COOKIE_NAME);
+    return null;
+  }
+}
 
-        if (!adminEmail || !adminPassword) {
-          throw new Error("Admin credentials not configured");
-        }
+export async function requireAuth(): Promise<AuthResult> {
+  const auth = await getAuth();
+  if (!auth) redirect("/login");
+  return auth;
+}
 
-        if (
-          credentials?.email === adminEmail &&
-          credentials?.password === adminPassword
-        ) {
-          return {
-            id: "1",
-            name: "Admin",
-            email: adminEmail,
-            role: "admin",
-          };
-        }
-
-        throw new Error("Invalid email or password");
-      },
-    }),
-  ],
-  pages: {
-    signIn: "/login",
-    error: "/login",
-  },
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        token.role = (user as any).role as string;
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      if (session.user) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (session.user as any).role = token.role;
-      }
-      return session;
-    },
-    async authorized({ auth, request }) {
-      const isAdmin = request.nextUrl.pathname.startsWith("/admin");
-      if (isAdmin && !auth?.user) {
-        return false;
-      }
-      return true;
-    },
-  },
-  session: {
-    strategy: "jwt",
-    maxAge: 7 * 24 * 60 * 60, // 7 days
-  },
-  trustHost: true,
-});
+export async function requireAdmin(): Promise<AuthResult> {
+  const auth = await requireAuth();
+  if (auth.user.role !== "admin") redirect("/");
+  return auth;
+}

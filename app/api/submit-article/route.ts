@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { articleSchema } from "@/lib/validators";
-import { getAuthPB } from "@/lib/pb";
+import { createAdminPb } from "@/lib/pb";
 import { slugify } from "@/lib/utils";
 
 export async function POST(req: Request) {
@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     const wordCount = data.body.split(/\s+/).length;
     const readTime = Math.max(1, Math.ceil(wordCount / 200));
 
-    const pb = await getAuthPB();
+    const pb = await createAdminPb();
 
     const submission = await pb.collection("submissions_article").create({
       title: data.title,

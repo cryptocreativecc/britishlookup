@@ -1,24 +1,34 @@
 import PocketBase from "pocketbase";
 
-let pb: PocketBase | null = null;
+const PB_URL = process.env.POCKETBASE_URL || "https://pb.britishlookup.co.uk";
 
-export function getPB(): PocketBase {
-  if (!pb) {
-    const url = process.env.POCKETBASE_URL;
-    if (!url) throw new Error("POCKETBASE_URL is not set");
-    pb = new PocketBase(url);
-    pb.autoCancellation(false);
-  }
+export function createPb(): PocketBase {
+  const pb = new PocketBase(PB_URL);
+  pb.autoCancellation(false);
   return pb;
 }
 
-export async function getAuthPB(): Promise<PocketBase> {
-  const client = getPB();
-  const email = process.env.POCKETBASE_ADMIN_EMAIL;
-  const password = process.env.POCKETBASE_ADMIN_PASSWORD;
-  if (!email || !password) {
-    throw new Error("PocketBase admin credentials not set");
-  }
-  await client.collection("_superusers").authWithPassword(email, password);
-  return client;
+let adminPb: PocketBase | null = null;
+let adminAuthPromise: Promise<PocketBase> | null = null;
+
+export async function createAdminPb(): Promise<PocketBase> {
+  if (adminPb?.authStore?.isValid) return adminPb;
+
+  // Deduplicate concurrent auth requests
+  if (adminAuthPromise) return adminAuthPromise;
+
+  adminAuthPromise = (async () => {
+    const email = process.env.POCKETBASE_ADMIN_EMAIL;
+    const password = process.env.POCKETBASE_ADMIN_PASSWORD;
+    if (!email || !password) throw new Error("PocketBase admin credentials not set");
+
+    const pb = new PocketBase(PB_URL);
+    pb.autoCancellation(false);
+    await pb.collection("_superusers").authWithPassword(email, password);
+    adminPb = pb;
+    adminAuthPromise = null;
+    return pb;
+  })();
+
+  return adminAuthPromise;
 }

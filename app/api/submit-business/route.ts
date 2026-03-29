@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { businessSchema } from "@/lib/validators";
-import { getAuthPB } from "@/lib/pb";
+import { createAdminPb } from "@/lib/pb";
 import { slugify } from "@/lib/utils";
 
 async function geocodePostcode(postcode: string) {
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
       ? data.tags.split(",").map((t) => t.trim()).filter(Boolean)
       : [];
 
-    const pb = await getAuthPB();
+    const pb = await createAdminPb();
 
     // Write to submissions_business collection
     const submission = await pb.collection("submissions_business").create({
