@@ -6,6 +6,7 @@ import { ContactCard } from "@/components/directory/contact-card";
 import { ReviewsSection } from "@/components/directory/reviews-section";
 import { ApprovedSeal } from "@/components/ui/approved-seal";
 import { ServicesDisplay } from "@/components/directory/services-display";
+import { ListingMap } from "@/components/directory/listing-map";
 import { createAdminPb } from "@/lib/pb";
 import { listingMeta } from "@/lib/seo";
 import { notFound } from "next/navigation";
@@ -171,6 +172,11 @@ export default async function ListingPage({ params }: { params: Promise<{ slug: 
 
             {/* Contact */}
             <ContactCard address={biz.address} town={biz.town} postcode={biz.postcode} phone={biz.phone} email={biz.email} website={biz.website} anchorText={anchorText} />
+
+            {/* Map */}
+            {biz.lat && biz.lng && biz.lat !== 0 && biz.lng !== 0 && (
+              <ListingMap lat={biz.lat} lng={biz.lng} name={biz.name} />
+            )}
 
             {/* Social Links */}
             {hasSocials && (
