@@ -40,7 +40,7 @@ export async function POST(
     const claimUser = claim.expand?.user;
     const business = claim.expand?.business;
     if (claimUser?.email && business) {
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://britishlookup.co.uk";
+      const siteUrl = process.env.SITE_URL || "https://britishlookup.co.uk";
       try {
         await sendEmail({
           to: claimUser.email,

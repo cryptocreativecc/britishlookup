@@ -67,7 +67,7 @@ export async function registerAction(formData: FormData): Promise<ActionResult> 
       verification_token: verificationToken,
     });
 
-    const siteUrl = process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://britishlookup.co.uk";
+    const siteUrl = process.env.SITE_URL || "https://britishlookup.co.uk";
     const verifyLink = `${siteUrl}/api/verify-email?token=${verificationToken}`;
     await sendEmail({
       to: email,
@@ -100,7 +100,7 @@ export async function resendVerificationAction(formData: FormData): Promise<Acti
       const verificationToken = crypto.randomUUID();
       await pb.collection("users").update(user.id, { verification_token: verificationToken });
 
-      const siteUrl = process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://britishlookup.co.uk";
+      const siteUrl = process.env.SITE_URL || "https://britishlookup.co.uk";
       const verifyLink = `${siteUrl}/api/verify-email?token=${verificationToken}`;
       await sendEmail({
         to: email,
@@ -116,7 +116,7 @@ export async function resendVerificationAction(formData: FormData): Promise<Acti
 
 export async function resetPasswordAction(formData: FormData): Promise<ActionResult> {
   const email = formData.get("email") as string;
-  const siteUrl = process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://britishlookup.co.uk";
+  const siteUrl = process.env.SITE_URL || "https://britishlookup.co.uk";
 
   try {
     const pb = await createAdminPb();
