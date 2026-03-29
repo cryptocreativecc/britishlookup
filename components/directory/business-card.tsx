@@ -11,6 +11,7 @@ interface BusinessCardProps {
   description: string;
   isFeatured?: boolean;
   isVerified?: boolean;
+  icon?: string;
 }
 
 export function BusinessCard({
@@ -21,15 +22,20 @@ export function BusinessCard({
   description,
   isFeatured,
   isVerified,
+  icon,
 }: BusinessCardProps) {
   return (
     <Link href={`/directory/${slug}`}>
       <Card className="h-full hover:border-brand/30">
         <CardContent>
           <div className="flex items-start justify-between gap-2">
-            <div className="w-12 h-12 rounded-[var(--radius-btn)] bg-brand-light flex items-center justify-center text-brand font-bold text-lg shrink-0">
-              {name.charAt(0)}
-            </div>
+            {icon ? (
+              <img src={icon} alt={name} className="w-12 h-12 rounded-[var(--radius-btn)] object-contain bg-white border border-border shrink-0" />
+            ) : (
+              <div className="w-12 h-12 rounded-[var(--radius-btn)] bg-brand-light flex items-center justify-center text-brand font-bold text-lg shrink-0">
+                {name.charAt(0)}
+              </div>
+            )}
             <div className="flex gap-1.5">
               {isFeatured && <Badge variant="brand">Featured</Badge>}
               {isVerified && <Badge variant="outline">✓ Verified</Badge>}

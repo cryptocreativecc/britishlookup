@@ -197,6 +197,7 @@ export default async function DirectoryPage({
                 category={biz.categoryName}
                 isFeatured={biz.isFeatured}
                 isVerified={biz.isVerified}
+                icon={biz.logo}
               />
             ))}
           </div>
