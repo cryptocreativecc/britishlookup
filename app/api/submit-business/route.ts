@@ -40,6 +40,11 @@ export async function POST(req: Request) {
       if (typeof value === "string") fields[key] = value;
     }
 
+    // Auto-prepend https:// to website if user forgot
+    if (fields.website && fields.website.trim() && !/^https?:\/\//i.test(fields.website)) {
+      fields.website = `https://${fields.website.trim()}`;
+    }
+
     const parsed = businessSchema.safeParse(fields);
     if (!parsed.success) {
       const errors = parsed.error.flatten().fieldErrors;
