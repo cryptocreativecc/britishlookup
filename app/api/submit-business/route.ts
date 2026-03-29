@@ -48,7 +48,11 @@ export async function POST(req: Request) {
     const parsed = businessSchema.safeParse(fields);
     if (!parsed.success) {
       const errors = parsed.error.flatten().fieldErrors;
-      return NextResponse.json({ error: "Validation failed", errors }, { status: 400 });
+      console.error("Business validation failed:", JSON.stringify(errors), "Fields:", JSON.stringify(fields));
+      const fieldMessages = Object.entries(errors)
+        .map(([field, msgs]) => `${field}: ${(msgs as string[]).join(", ")}`)
+        .join("; ");
+      return NextResponse.json({ error: `Validation failed — ${fieldMessages}`, errors }, { status: 400 });
     }
 
     const data = parsed.data;
