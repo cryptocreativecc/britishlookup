@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { requireAuth } from "@/lib/auth";
 import { createAdminPb } from "@/lib/pb";
 import Link from "next/link";

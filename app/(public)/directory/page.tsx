@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { SearchBar } from "@/components/ui/search-bar";
 import { Badge } from "@/components/ui/badge";
 import { BusinessCard } from "@/components/directory/business-card";

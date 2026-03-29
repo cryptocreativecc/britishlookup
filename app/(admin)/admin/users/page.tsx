@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { createAdminPb } from "@/lib/pb";
 import { Badge } from "@/components/ui/badge";
 import { UserRoleSelect } from "./user-role-select";

@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { requireAuth } from "@/lib/auth";
 import { ProfileForm } from "./profile-form";
 import type { Metadata } from "next";
