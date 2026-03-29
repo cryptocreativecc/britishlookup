@@ -27,7 +27,7 @@ export default async function HomePage() {
   try {
     const result = await pb.collection("businesses").getList(1, 4, {
       filter: 'status = "approved"',
-      sort: "-is_featured,-created",
+      sort: "-is_featured,-id",
       expand: "category",
     });
     businesses = result.items.map((b) => ({
@@ -39,14 +39,14 @@ export default async function HomePage() {
       isFeatured: b.is_featured || false,
       isVerified: b.is_verified || false,
     }));
-  } catch { /* */ }
+  } catch (e) { console.error("PB query error:", e); }
 
   // Fetch recent published articles
   let articles: { title: string; slug: string; excerpt: string; category: string; authorName: string; readTime: number; publishedAt: string }[] = [];
   try {
     const result = await pb.collection("articles").getList(1, 3, {
       filter: 'status = "published"',
-      sort: "-published_at",
+      sort: "-id",
     });
     articles = result.items.map((a) => ({
       title: a.title,
@@ -57,7 +57,7 @@ export default async function HomePage() {
       readTime: a.read_time || 3,
       publishedAt: a.published_at || a.created,
     }));
-  } catch { /* */ }
+  } catch (e) { console.error("PB query error:", e); }
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd()) }} />

@@ -25,7 +25,7 @@ export default async function BlogPage() {
   try {
     const result = await pb.collection("articles").getFullList({
       filter: 'status = "published"',
-      sort: "-published_at",
+      sort: "-id",
       expand: "category",
     });
     articles = result.map((a) => ({

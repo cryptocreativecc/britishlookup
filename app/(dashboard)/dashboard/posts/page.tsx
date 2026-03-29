@@ -15,7 +15,7 @@ export default async function MyPostsPage() {
   try {
     const result = await pb.collection("articles").getFullList({
       filter: `author="${auth.user.id}"`,
-      sort: "-created",
+      sort: "-id",
     });
     posts = result.map((r) => ({
       id: r.id,

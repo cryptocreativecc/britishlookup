@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
     const pb = await createAdminPb();
     const result = await pb.collection("reviews").getFullList({
       filter: `business="${businessId}" && status="approved"`,
-      sort: "-created",
+      sort: "-id",
     });
     const reviews = result.map((r) => ({
       id: r.id,

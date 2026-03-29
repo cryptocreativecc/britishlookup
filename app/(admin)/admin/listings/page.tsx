@@ -13,7 +13,7 @@ export default async function AdminListingsPage({
   const { status: filterStatus } = await searchParams;
   const pb = await createAdminPb();
 
-  const filter = filterStatus ? `status="${filterStatus}"` : "";
+  const filter = filterStatus ? `status="${filterStatus}"` : undefined;
 
   let listings: {
     id: string;
@@ -28,8 +28,8 @@ export default async function AdminListingsPage({
 
   try {
     const result = await pb.collection("businesses").getFullList({
-      sort: "-created",
-      filter,
+      sort: "-id",
+      ...(filter ? { filter } : {}),
       expand: "owner",
     });
     listings = result.map((r) => ({
@@ -42,7 +42,7 @@ export default async function AdminListingsPage({
       ownerName: r.expand?.owner?.name || "",
       created: r.created,
     }));
-  } catch { /* collection may not exist */ }
+  } catch (e) { console.error("Admin listings error:", e); }
 
   const statusColor: Record<string, string> = {
     pending: "bg-yellow-100 text-yellow-800",

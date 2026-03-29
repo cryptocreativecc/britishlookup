@@ -20,7 +20,7 @@ export default async function AdminReviewsPage() {
 
   try {
     const result = await pb.collection("reviews").getFullList({
-      sort: "-created",
+      sort: "-id",
       expand: "business",
     });
     reviews = result.map((r) => ({

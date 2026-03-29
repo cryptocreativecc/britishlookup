@@ -25,7 +25,7 @@ export default async function AdminArticlesPage({
 
   try {
     const result = await pb.collection("articles").getFullList({
-      sort: "-created",
+      sort: "-id",
       filter,
     });
     articles = result.map((r) => ({

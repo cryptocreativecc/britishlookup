@@ -28,12 +28,12 @@ export default async function DirectoryPage({
   try {
     const catResult = await pb.collection("categories").getFullList({ sort: "name" });
     categories = catResult.map((c) => ({ id: c.id, name: c.name, slug: c.slug, icon: c.icon || "" }));
-  } catch { /* */ }
+  } catch (e) { console.error("Directory categories error:", e); }
 
   try {
     const regResult = await pb.collection("regions").getFullList({ sort: "name" });
     regions = regResult.map((r) => ({ id: r.id, name: r.name, slug: r.slug }));
-  } catch { /* */ }
+  } catch (e) { console.error("PB query error:", e); }
 
   // Build filter
   const filters: string[] = ['(status = "approved" || status = "featured")'];
@@ -66,7 +66,7 @@ export default async function DirectoryPage({
   try {
     const result = await pb.collection("businesses").getList(currentPage, perPage, {
       filter: filters.join(" && "),
-      sort: "-is_featured,-created",
+      sort: "-is_featured,-id",
       expand: "category",
     });
     businesses = result.items.map((b) => ({
@@ -82,7 +82,7 @@ export default async function DirectoryPage({
     }));
     totalItems = result.totalItems;
     totalPages = result.totalPages;
-  } catch { /* */ }
+  } catch (e) { console.error("PB query error:", e); }
 
   // Build URL helper
   function buildUrl(params: Record<string, string | undefined>) {

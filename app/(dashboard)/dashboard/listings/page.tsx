@@ -15,7 +15,7 @@ export default async function MyListingsPage() {
   try {
     const result = await pb.collection("businesses").getFullList({
       filter: `owner="${auth.user.id}"`,
-      sort: "-created",
+      sort: "-id",
     });
     listings = result.map((r) => ({
       id: r.id,

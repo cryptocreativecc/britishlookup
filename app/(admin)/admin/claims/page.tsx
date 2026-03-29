@@ -20,7 +20,7 @@ export default async function AdminClaimsPage() {
 
   try {
     const result = await pb.collection("claims").getFullList({
-      sort: "-created",
+      sort: "-id",
       expand: "business,user",
     });
     claims = result.map((c) => ({

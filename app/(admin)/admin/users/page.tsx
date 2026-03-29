@@ -11,7 +11,7 @@ export default async function AdminUsersPage() {
 
   let users: { id: string; name: string; email: string; role: string; verified: boolean; created: string }[] = [];
   try {
-    const result = await pb.collection("users").getFullList({ sort: "-created" });
+    const result = await pb.collection("users").getFullList({ sort: "-id" });
     users = result.map((u) => ({
       id: u.id,
       name: u.name || "",
