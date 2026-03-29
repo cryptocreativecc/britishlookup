@@ -99,7 +99,7 @@ export function SubmitBusinessForm({ categories, regions }: Props) {
         <Field label="Email Address" name="email" type="email" required errors={errors.email} />
       </div>
 
-      <Field label="Website URL" name="website" type="url" placeholder="https://example.com" errors={errors.website} />
+      <Field label="Website URL" name="website" placeholder="https://example.com" errors={errors.website} />
 
       <div>
         <label className="block text-sm font-medium text-text mb-1.5">Business Description *</label>
