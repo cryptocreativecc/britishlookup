@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 const inputClass = "w-full h-11 px-4 rounded-[var(--radius-btn)] border border-border bg-white text-text focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand";
@@ -8,9 +9,11 @@ const inputClass = "w-full h-11 px-4 rounded-[var(--radius-btn)] border border-b
 interface Props {
   categories: { id: string; name: string }[];
   regions: { id: string; name: string }[];
+  redirectTo?: string;
 }
 
-export function SubmitBusinessForm({ categories = [], regions = [] }: Props) {
+export function SubmitBusinessForm({ categories = [], regions = [], redirectTo }: Props) {
+  const router = useRouter();
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [errorMsg, setErrorMsg] = useState("");
@@ -57,6 +60,10 @@ export function SubmitBusinessForm({ categories = [], regions = [] }: Props) {
         return;
       }
 
+      if (redirectTo) {
+        router.push(redirectTo);
+        return;
+      }
       setStatus("success");
     } catch {
       setErrorMsg("Network error — please try again");
