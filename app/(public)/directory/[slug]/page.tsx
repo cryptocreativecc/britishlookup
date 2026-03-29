@@ -134,7 +134,7 @@ export default async function ListingPage({ params }: { params: Promise<{ slug: 
               {biz.full_description ? (
                 <div dangerouslySetInnerHTML={{ __html: biz.full_description }} />
               ) : (
-                <p>{biz.description}</p>
+                <p className="whitespace-pre-line">{biz.description}</p>
               )}
             </div>
 

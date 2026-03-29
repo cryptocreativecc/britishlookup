@@ -148,7 +148,7 @@ export function SubmitBusinessForm({ categories = [], regions = [], redirectTo }
 
       <div>
         <label className="block text-sm font-medium text-text mb-1.5">Business Description *</label>
-        <textarea name="description" required rows={4} maxLength={1200} className="w-full px-4 py-3 rounded-[var(--radius-btn)] border border-border bg-white text-text focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand resize-none" placeholder="Tell us about your business (max 1200 characters)" />
+        <textarea name="description" required rows={6} maxLength={2400} className="w-full px-4 py-3 rounded-[var(--radius-btn)] border border-border bg-white text-text focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand resize-none" placeholder="Tell us about your business (max 2400 characters)" />
         <FieldError errors={errors.description} />
       </div>
 

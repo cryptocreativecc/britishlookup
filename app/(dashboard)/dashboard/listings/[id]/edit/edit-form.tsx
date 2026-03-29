@@ -187,7 +187,7 @@ export function EditListingForm({ listing, categories, regions }: Props) {
                 defaultValue={listing.description}
                 required
                 rows={4}
-                maxLength={1200}
+                maxLength={2400}
                 className="w-full px-4 py-3 rounded-[var(--radius-btn)] border border-border bg-white text-text focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand resize-none"
               />
             </div>
