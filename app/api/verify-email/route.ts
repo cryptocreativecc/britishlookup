@@ -1,10 +1,12 @@
 import { createAdminPb } from "@/lib/pb";
 import { NextRequest, NextResponse } from "next/server";
 
+const BASE_URL = process.env.SITE_URL || "https://britishlookup.co.uk";
+
 export async function GET(request: NextRequest) {
   const token = request.nextUrl.searchParams.get("token");
   if (!token) {
-    return NextResponse.redirect(new URL("/login?error=invalid-token", request.url));
+    return NextResponse.redirect(`${BASE_URL}/login?error=invalid-token`);
   }
 
   try {
@@ -18,8 +20,8 @@ export async function GET(request: NextRequest) {
       verification_token: "",
     });
 
-    return NextResponse.redirect(new URL("/login?verified=true", request.url));
+    return NextResponse.redirect(`${BASE_URL}/login?verified=true`);
   } catch {
-    return NextResponse.redirect(new URL("/login?error=invalid-token", request.url));
+    return NextResponse.redirect(`${BASE_URL}/login?error=invalid-token`);
   }
 }
