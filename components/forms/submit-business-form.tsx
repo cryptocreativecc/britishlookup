@@ -21,7 +21,14 @@ export function SubmitBusinessForm({ categories, regions }: Props) {
     setErrors({});
     setErrorMsg("");
 
-    const form = new FormData(e.currentTarget);
+    const formEl = e.currentTarget;
+    const form = new FormData(formEl);
+
+    // Ensure select values are captured (hydration safety)
+    formEl.querySelectorAll("select[name]").forEach((sel) => {
+      const s = sel as HTMLSelectElement;
+      if (s.name && s.value) form.set(s.name, s.value);
+    });
 
     try {
       const res = await fetch("/api/submit-business", { method: "POST", body: form });
