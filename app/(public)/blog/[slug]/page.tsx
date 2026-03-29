@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { createAdminPb } from "@/lib/pb";
+import { ReadingProgress } from "@/components/ui/reading-progress";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
@@ -54,6 +55,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   }
 
   return (
+    <>
+    <ReadingProgress />
     <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <div className="flex items-center gap-2 mb-4">
         {categoryName && <Badge variant="brand">{categoryName}</Badge>}
@@ -113,5 +116,6 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         </Card>
       )}
     </article>
+    </>
   );
 }
