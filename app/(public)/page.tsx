@@ -10,10 +10,10 @@ const POPULAR_CATEGORIES = [
   "Builders", "Electricians", "Restaurants", "Accountants", "Web Design", "Plumbers", "Salons", "Solicitors",
 ];
 
-const STATS = [
+const STATIC_STATS = [
   { label: "Business Categories", value: "49" },
-  { label: "UK Regions", value: "53" },
-  { label: "Free Listings", value: "100%" },
+  { label: "UK Regions Covered", value: "53" },
+  { label: "Free to List", value: "100%" },
   { label: "Dofollow Backlinks", value: "✓" },
 ];
 
@@ -64,6 +64,21 @@ export default async function HomePage() {
       coverImage: a.cover_image ? `https://pb.britishlookup.co.uk/api/files/articles/${a.id}/${a.cover_image}` : "",
     }));
   } catch (e) { console.error("PB query error:", e); }
+
+  // Get total business count
+  let businessCount = 0;
+  try {
+    const countResult = await pb.collection("businesses").getList(1, 1, {
+      filter: 'status="approved" || status="featured"',
+    });
+    businessCount = countResult.totalItems;
+  } catch {}
+
+  const STATS = [
+    { label: "Businesses Listed", value: businessCount > 0 ? businessCount.toLocaleString() : "Growing" },
+    ...STATIC_STATS,
+  ];
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd()) }} />
@@ -73,13 +88,13 @@ export default async function HomePage() {
       <section className="bg-gradient-to-b from-brand-light/50 to-white py-20 sm:py-28">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-text">
-            Find &amp; list{" "}
-            <span className="text-brand">UK businesses</span>
+            The free{" "}
+            <span className="text-brand">UK business directory</span>
           </h1>
           <p className="mt-4 text-lg sm:text-xl text-text-muted max-w-2xl mx-auto">
-            The free UK business directory. From local tradespeople to restaurants,
-            tech companies to wedding venues — discover and connect with businesses
-            across Britain.
+            List your business for free and get a verified listing with a dofollow
+            backlink to boost your SEO. Write expert articles to build authority and
+            reach new customers across every industry and region in Britain.
           </p>
           <form action="/directory" method="GET" className="mt-8 max-w-xl mx-auto">
             <SearchBar />
