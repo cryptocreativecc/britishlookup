@@ -98,7 +98,7 @@ export default async function ListingPage({ params }: { params: Promise<{ slug: 
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-4">
               {biz.logo ? (
-                <img src={`https://pb.britishlookup.co.uk/api/files/businesses/${biz.id}/${biz.logo}`} alt={biz.name} itemProp="image" className="w-24 h-24 p-2 rounded-[var(--radius-card)] object-contain bg-white border border-border" />
+                <img src={`https://pb.britishlookup.co.uk/api/files/businesses/${biz.id}/${biz.logo}`} alt={biz.name} itemProp="image" className="w-24 h-24 rounded-[var(--radius-card)] object-contain bg-white border border-border" />
               ) : (
                 <div className="w-24 h-24 rounded-[var(--radius-card)] bg-brand-light flex items-center justify-center text-brand font-bold text-3xl">{initial}</div>
               )}
@@ -117,7 +117,10 @@ export default async function ListingPage({ params }: { params: Promise<{ slug: 
               </div>
             </div>
 
-            <div className="mt-6 prose max-w-none text-text" itemProp="description">
+            <div className="mt-6">
+              <h2 className="text-lg font-semibold text-text mb-2">About</h2>
+            </div>
+            <div className="prose max-w-none text-text" itemProp="description">
               {biz.full_description ? (
                 <div dangerouslySetInnerHTML={{ __html: biz.full_description }} />
               ) : (
