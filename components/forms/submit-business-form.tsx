@@ -1,23 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
 const inputClass = "w-full h-11 px-4 rounded-[var(--radius-btn)] border border-border bg-white text-text focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand";
 
-export function SubmitBusinessForm() {
+interface Props {
+  categories: { id: string; name: string }[];
+  regions: { id: string; name: string }[];
+}
+
+export function SubmitBusinessForm({ categories = [], regions = [] }: Props) {
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [errorMsg, setErrorMsg] = useState("");
-  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
-  const [regions, setRegions] = useState<{ id: string; name: string }[]>([]);
   const [category, setCategory] = useState("");
   const [region, setRegion] = useState("");
-
-  useEffect(() => {
-    fetch("/api/lookup/categories").then(r => r.json()).then(d => setCategories(d)).catch(() => {});
-    fetch("/api/lookup/regions").then(r => r.json()).then(d => setRegions(d)).catch(() => {});
-  }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -25,13 +23,31 @@ export function SubmitBusinessForm() {
     setErrors({});
     setErrorMsg("");
 
-    const form = new FormData(e.currentTarget);
-    // Explicitly set select values
-    form.set("category", category);
-    form.set("region", region);
+    // Build JSON payload instead of FormData to avoid serialisation issues
+    const formEl = e.currentTarget;
+    const fd = new FormData(formEl);
+    
+    // Create a new FormData with explicit values
+    const payload = new FormData();
+    payload.set("name", fd.get("name") as string || "");
+    payload.set("category", category);
+    payload.set("region", region);
+    payload.set("town", fd.get("town") as string || "");
+    payload.set("postcode", fd.get("postcode") as string || "");
+    payload.set("address", fd.get("address") as string || "");
+    payload.set("phone", fd.get("phone") as string || "");
+    payload.set("email", fd.get("email") as string || "");
+    payload.set("website", fd.get("website") as string || "");
+    payload.set("description", fd.get("description") as string || "");
+    payload.set("tags", fd.get("tags") as string || "");
+    
+    const logo = fd.get("logo") as File;
+    if (logo && logo.size > 0) {
+      payload.set("logo", logo);
+    }
 
     try {
-      const res = await fetch("/api/submit-business", { method: "POST", body: form });
+      const res = await fetch("/api/submit-business", { method: "POST", body: payload });
       const data = await res.json();
 
       if (!res.ok) {
@@ -85,8 +101,13 @@ export function SubmitBusinessForm() {
             className={inputClass}
           >
             <option value="">Select a category</option>
-            {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+            {categories.map((c) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
           </select>
+          {categories.length === 0 && (
+            <p className="text-xs text-red-500 mt-1">Loading categories failed. Please refresh the page.</p>
+          )}
           <FieldError errors={errors.category} />
         </div>
         <div>
@@ -98,8 +119,13 @@ export function SubmitBusinessForm() {
             className={inputClass}
           >
             <option value="">Select a region</option>
-            {regions.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
+            {regions.map((r) => (
+              <option key={r.id} value={r.id}>{r.name}</option>
+            ))}
           </select>
+          {regions.length === 0 && (
+            <p className="text-xs text-red-500 mt-1">Loading regions failed. Please refresh the page.</p>
+          )}
           <FieldError errors={errors.region} />
         </div>
       </div>
