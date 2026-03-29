@@ -153,7 +153,7 @@ export default async function ListingPage({ params }: { params: Promise<{ slug: 
               <img
                 src={`https://pb.britishlookup.co.uk/api/files/businesses/${biz.id}/${biz.banner}`}
                 alt={`${biz.name} logo`}
-                className="w-full rounded-[var(--radius-card)] border border-border object-contain bg-white"
+                className="w-full rounded-[var(--radius-card)] border border-border object-contain bg-white p-4"
               />
             )}
 
