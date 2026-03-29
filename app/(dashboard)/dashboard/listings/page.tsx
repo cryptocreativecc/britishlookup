@@ -57,7 +57,7 @@ export default async function MyListingsPage() {
               <div>
                 <h3 className="font-medium text-text">{listing.name}</h3>
                 <p className="text-xs text-text-muted">
-                  Added {new Date(listing.created).toLocaleDateString("en-GB")}
+                  {listing.created ? `Added ${new Date(listing.created).toLocaleDateString("en-GB")}` : ""}
                 </p>
               </div>
               <div className="flex items-center gap-3">
