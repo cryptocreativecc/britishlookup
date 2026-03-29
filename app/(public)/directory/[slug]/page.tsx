@@ -65,7 +65,16 @@ export default async function ListingPage({ params }: { params: Promise<{ slug: 
   const anchorText = biz.anchor_text || (biz.website ? displayDomain(biz.website) : "");
   const siteUrl = process.env.SITE_URL || "https://britishlookup.co.uk";
   const services = parseJSON<{ title: string; description: string; url: string }[]>(biz.services, []);
-  const openingHours = parseJSON<Record<string, { enabled: boolean; is24h: boolean; slots: { open: string; close: string }[] }>>(biz.opening_hours, {});
+  const rawHours = parseJSON<Record<string, Record<string, unknown>>>(biz.opening_hours, {});
+  // Normalise: support both {enabled,is24h} and {closed,is24} shapes
+  const openingHours = Object.fromEntries(
+    Object.entries(rawHours).map(([day, d]) => {
+      const enabled = d.enabled !== undefined ? !!d.enabled : d.closed !== undefined ? !d.closed : false;
+      const is24h = !!(d.is24h ?? d.is24);
+      const slots = (Array.isArray(d.slots) ? d.slots : [{ open: "09:00", close: "17:00" }]) as { open: string; close: string }[];
+      return [day, { enabled, is24h, slots }];
+    })
+  );
   const socialLinks = parseJSON<Record<string, string>>(biz.social_links, {});
   const amenities = parseJSON<string[]>(biz.amenities, []);
   const hasSocials = Object.values(socialLinks).some((v) => !!v);

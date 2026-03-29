@@ -48,7 +48,20 @@ export function EditListingForm({ listing, categories, regions }: Props) {
   const [category, setCategory] = useState(listing.category || "");
   const [region, setRegion] = useState(listing.region || "");
   const [services, setServices] = useState<ServiceItem[]>(parseJson(listing.services, []));
-  const [openingHours, setOpeningHours] = useState<OpeningHours>(parseJson(listing.opening_hours, defaultOpeningHours()));
+  const [openingHours, setOpeningHours] = useState<OpeningHours>(() => {
+    const raw = parseJson<Record<string, Record<string, unknown>>>(listing.opening_hours, {});
+    const base = defaultOpeningHours();
+    for (const [day, d] of Object.entries(raw)) {
+      if (base[day]) {
+        base[day] = {
+          enabled: d.enabled !== undefined ? !!d.enabled : d.closed !== undefined ? !d.closed : false,
+          is24h: !!(d.is24h ?? d.is24),
+          slots: Array.isArray(d.slots) ? d.slots as { open: string; close: string }[] : [{ open: "09:00", close: "17:00" }],
+        };
+      }
+    }
+    return base;
+  });
   const [amenities, setAmenities] = useState<string[]>(parseJson(listing.amenities, []));
   const [socialLinks, setSocialLinks] = useState<SocialLinks>(parseJson(listing.social_links, emptySocialLinks));
 
