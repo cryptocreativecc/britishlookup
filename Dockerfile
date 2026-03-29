@@ -15,6 +15,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_PUBLIC_SITE_URL=https://britishlookup.co.uk
+ENV NEXT_PUBLIC_GA_ID=G-KP6XJ31RG3
 RUN npm run build
 
 # Production
