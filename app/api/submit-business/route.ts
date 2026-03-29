@@ -36,8 +36,7 @@ export async function POST(req: Request) {
     const formData = await req.formData();
 
     const fields: Record<string, string> = {};
-    // Ensure all expected fields have at least empty string (prevents "received undefined")
-    const expectedFields = ["name", "category", "region", "town", "postcode", "address", "phone", "email", "website", "description", "tags"];
+    const expectedFields = ["name", "category", "region", "town", "postcode", "address", "phone", "email", "website", "description", "services", "social_links", "opening_hours", "amenities"];
     for (const f of expectedFields) fields[f] = "";
     for (const [key, value] of formData.entries()) {
       if (typeof value === "string") fields[key] = value;
@@ -66,74 +65,61 @@ export async function POST(req: Request) {
     const pb2 = await createAdminPb();
     try {
       await pb2.collection("businesses").getFirstListItem(`slug="${slug}"`);
-      // Slug exists — append random suffix
       slug = `${slug}-${Date.now().toString(36).slice(-4)}`;
     } catch { /* slug is unique */ }
-    const tags = data.tags
-      ? data.tags.split(",").map((t) => t.trim()).filter(Boolean)
-      : [];
 
     const pb = await createAdminPb();
     const user = await getLoggedInUser();
 
+    const baseRecord = {
+      name: data.name,
+      slug,
+      description: data.description,
+      category: data.category || "",
+      region: data.region || "",
+      town: data.town,
+      postcode: data.postcode,
+      address: data.address || "",
+      phone: data.phone || "",
+      email: data.email,
+      website: data.website,
+      anchor_text: data.anchor_text || "",
+      services: data.services || "[]",
+      social_links: data.social_links || "{}",
+      opening_hours: data.opening_hours || "{}",
+      amenities: data.amenities || "[]",
+      status: "pending",
+      lat: geo?.lat || 0,
+      lng: geo?.lng || 0,
+    };
+
     if (user) {
-      // Logged-in user: create directly in businesses collection with owner
       const record = await pb.collection("businesses").create({
-        name: data.name,
-        slug,
-        description: data.description,
-        category: data.category || "",
-        region: data.region || "",
-        town: data.town,
-        postcode: data.postcode,
-        address: data.address || "",
-        phone: data.phone || "",
-        email: data.email,
-        website: data.website,
-        anchor_text: data.anchor_text || "",
-        tags: JSON.stringify(tags),
-        status: "pending",
+        ...baseRecord,
         owner: user.id,
         claimed: true,
-        lat: geo?.lat || 0,
-        lng: geo?.lng || 0,
       });
 
+      // Handle file uploads
+      const fileForm = new FormData();
+      let hasFiles = false;
       const logo = formData.get("logo") as File | null;
-      if (logo && logo.size > 0) {
-        const logoForm = new FormData();
-        logoForm.append("logo", logo);
-        await pb.collection("businesses").update(record.id, logoForm);
-      }
+      if (logo && logo.size > 0) { fileForm.append("logo", logo); hasFiles = true; }
+      const banner = formData.get("banner") as File | null;
+      if (banner && banner.size > 0) { fileForm.append("banner", banner); hasFiles = true; }
+      if (hasFiles) await pb.collection("businesses").update(record.id, fileForm);
 
       return NextResponse.json({ success: true, message: "Business submitted for review" });
     } else {
-      // Anonymous: write to submissions_business
-      const submission = await pb.collection("submissions_business").create({
-        name: data.name,
-        slug,
-        description: data.description,
-        category: data.category || "",
-        region: data.region || "",
-        town: data.town,
-        postcode: data.postcode,
-        address: data.address || "",
-        phone: data.phone || "",
-        email: data.email,
-        website: data.website,
-        anchor_text: data.anchor_text || "",
-        tags: JSON.stringify(tags),
-        status: "pending",
-        lat: geo?.lat || 0,
-        lng: geo?.lng || 0,
-      });
+      const submission = await pb.collection("submissions_business").create(baseRecord);
 
+      const fileForm = new FormData();
+      let hasFiles = false;
       const logo = formData.get("logo") as File | null;
-      if (logo && logo.size > 0) {
-        const logoForm = new FormData();
-        logoForm.append("logo", logo);
-        await pb.collection("submissions_business").update(submission.id, logoForm);
-      }
+      if (logo && logo.size > 0) { fileForm.append("logo", logo); hasFiles = true; }
+      const banner = formData.get("banner") as File | null;
+      if (banner && banner.size > 0) { fileForm.append("banner", banner); hasFiles = true; }
+      if (hasFiles) await pb.collection("submissions_business").update(submission.id, fileForm);
 
       // Send confirmation email (non-blocking)
       fetch(new URL("/api/emails/submission-confirm", req.url).toString(), {

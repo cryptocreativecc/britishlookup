@@ -26,10 +26,6 @@ export async function POST(
     }
 
     const form = await request.formData();
-    const tags = (form.get("tags") as string || "")
-      .split(",")
-      .map((t) => t.trim())
-      .filter(Boolean);
 
     const updateData: Record<string, unknown> = {
       name: form.get("name"),
@@ -41,7 +37,10 @@ export async function POST(
       postcode: form.get("postcode"),
       address: form.get("address") || "",
       description: form.get("description"),
-      tags,
+      services: form.get("services") || "[]",
+      social_links: form.get("social_links") || "{}",
+      opening_hours: form.get("opening_hours") || "{}",
+      amenities: form.get("amenities") || "[]",
     };
 
     const cat = form.get("category") as string;
@@ -50,9 +49,9 @@ export async function POST(
     if (reg) updateData.region = reg;
 
     const logo = form.get("logo") as File;
-    if (logo && logo.size > 0) {
-      updateData.logo = logo;
-    }
+    if (logo && logo.size > 0) updateData.logo = logo;
+    const banner = form.get("banner") as File;
+    if (banner && banner.size > 0) updateData.banner = banner;
 
     await adminPb.collection("businesses").update(id, updateData);
     return NextResponse.json({ success: true });

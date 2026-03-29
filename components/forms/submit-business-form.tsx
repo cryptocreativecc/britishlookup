@@ -3,6 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { ServicesEditor, type ServiceItem } from "./services-editor";
+import { OpeningHoursEditor, defaultOpeningHours, type OpeningHours } from "./opening-hours-editor";
+import { AmenitiesEditor } from "./amenities-editor";
+import { SocialLinksEditor, emptySocialLinks, type SocialLinks } from "./social-links-editor";
 
 const inputClass = "w-full h-11 px-4 rounded-[var(--radius-btn)] border border-border bg-white text-text focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand";
 
@@ -19,6 +23,10 @@ export function SubmitBusinessForm({ categories = [], regions = [], redirectTo }
   const [errorMsg, setErrorMsg] = useState("");
   const [category, setCategory] = useState("");
   const [region, setRegion] = useState("");
+  const [services, setServices] = useState<ServiceItem[]>([]);
+  const [openingHours, setOpeningHours] = useState<OpeningHours>(defaultOpeningHours());
+  const [amenities, setAmenities] = useState<string[]>([]);
+  const [socialLinks, setSocialLinks] = useState<SocialLinks>(emptySocialLinks);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -26,11 +34,9 @@ export function SubmitBusinessForm({ categories = [], regions = [], redirectTo }
     setErrors({});
     setErrorMsg("");
 
-    // Build JSON payload instead of FormData to avoid serialisation issues
     const formEl = e.currentTarget;
     const fd = new FormData(formEl);
-    
-    // Create a new FormData with explicit values
+
     const payload = new FormData();
     payload.set("name", fd.get("name") as string || "");
     payload.set("category", category);
@@ -43,12 +49,15 @@ export function SubmitBusinessForm({ categories = [], regions = [], redirectTo }
     payload.set("website", fd.get("website") as string || "");
     payload.set("anchor_text", fd.get("anchor_text") as string || "");
     payload.set("description", fd.get("description") as string || "");
-    payload.set("tags", fd.get("tags") as string || "");
-    
+    payload.set("services", JSON.stringify(services));
+    payload.set("opening_hours", JSON.stringify(openingHours));
+    payload.set("amenities", JSON.stringify(amenities));
+    payload.set("social_links", JSON.stringify(socialLinks));
+
     const logo = fd.get("logo") as File;
-    if (logo && logo.size > 0) {
-      payload.set("logo", logo);
-    }
+    if (logo && logo.size > 0) payload.set("logo", logo);
+    const banner = fd.get("banner") as File;
+    if (banner && banner.size > 0) payload.set("banner", banner);
 
     try {
       const res = await fetch("/api/submit-business", { method: "POST", body: payload });
@@ -102,38 +111,20 @@ export function SubmitBusinessForm({ categories = [], regions = [], redirectTo }
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div>
           <label className="block text-sm font-medium text-text mb-1.5">Category *</label>
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            required
-            className={inputClass}
-          >
+          <select value={category} onChange={(e) => setCategory(e.target.value)} required className={inputClass}>
             <option value="">Select a category</option>
-            {categories.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
+            {categories.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
           </select>
-          {categories.length === 0 && (
-            <p className="text-xs text-red-500 mt-1">Loading categories failed. Please refresh the page.</p>
-          )}
+          {categories.length === 0 && <p className="text-xs text-red-500 mt-1">Loading categories failed. Please refresh the page.</p>}
           <FieldError errors={errors.category} />
         </div>
         <div>
           <label className="block text-sm font-medium text-text mb-1.5">Region *</label>
-          <select
-            value={region}
-            onChange={(e) => setRegion(e.target.value)}
-            required
-            className={inputClass}
-          >
+          <select value={region} onChange={(e) => setRegion(e.target.value)} required className={inputClass}>
             <option value="">Select a region</option>
-            {regions.map((r) => (
-              <option key={r.id} value={r.id}>{r.name}</option>
-            ))}
+            {regions.map((r) => (<option key={r.id} value={r.id}>{r.name}</option>))}
           </select>
-          {regions.length === 0 && (
-            <p className="text-xs text-red-500 mt-1">Loading regions failed. Please refresh the page.</p>
-          )}
+          {regions.length === 0 && <p className="text-xs text-red-500 mt-1">Loading regions failed. Please refresh the page.</p>}
           <FieldError errors={errors.region} />
         </div>
       </div>
@@ -161,13 +152,23 @@ export function SubmitBusinessForm({ categories = [], regions = [], redirectTo }
         <FieldError errors={errors.description} />
       </div>
 
-      <Field label="Tags" name="tags" placeholder="web design, branding, Wigan (comma-separated)" errors={errors.tags} />
+      <ServicesEditor value={services} onChange={setServices} />
 
       <div>
-        <label className="block text-sm font-medium text-text mb-1.5">Logo Upload</label>
+        <label className="block text-sm font-medium text-text mb-1.5">Icon Upload</label>
         <input type="file" name="logo" accept="image/jpeg,image/png" className="w-full text-sm text-text-muted file:mr-4 file:py-2 file:px-4 file:rounded-[var(--radius-btn)] file:border-0 file:text-sm file:font-semibold file:bg-brand-light file:text-brand hover:file:bg-brand-light/80" />
-        <p className="text-xs text-text-muted mt-1">JPG or PNG, max 2MB</p>
+        <p className="text-xs text-text-muted mt-1">Small square image for cards/header. JPG or PNG, max 2MB</p>
       </div>
+
+      <div>
+        <label className="block text-sm font-medium text-text mb-1.5">Logo / Banner Upload</label>
+        <input type="file" name="banner" accept="image/jpeg,image/png" className="w-full text-sm text-text-muted file:mr-4 file:py-2 file:px-4 file:rounded-[var(--radius-btn)] file:border-0 file:text-sm file:font-semibold file:bg-brand-light file:text-brand hover:file:bg-brand-light/80" />
+        <p className="text-xs text-text-muted mt-1">Banner/header image displayed on your listing page. JPG or PNG, max 2MB</p>
+      </div>
+
+      <SocialLinksEditor value={socialLinks} onChange={setSocialLinks} />
+      <OpeningHoursEditor value={openingHours} onChange={setOpeningHours} />
+      <AmenitiesEditor value={amenities} onChange={setAmenities} />
 
       <Button type="submit" size="lg" className="w-full" disabled={status === "submitting"}>
         {status === "submitting" ? "Submitting…" : "Submit Business"}

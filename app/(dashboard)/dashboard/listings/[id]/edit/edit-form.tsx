@@ -4,6 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ServicesEditor, type ServiceItem } from "@/components/forms/services-editor";
+import { OpeningHoursEditor, defaultOpeningHours, type OpeningHours } from "@/components/forms/opening-hours-editor";
+import { AmenitiesEditor } from "@/components/forms/amenities-editor";
+import { SocialLinksEditor, emptySocialLinks, type SocialLinks } from "@/components/forms/social-links-editor";
 
 const inputClass = "w-full h-11 px-4 rounded-[var(--radius-btn)] border border-border bg-white text-text focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand";
 
@@ -22,9 +26,18 @@ interface Props {
     tags: string[];
     category: string;
     region: string;
+    services?: string;
+    opening_hours?: string;
+    amenities?: string;
+    social_links?: string;
   };
   categories: { id: string; name: string }[];
   regions: { id: string; name: string }[];
+}
+
+function parseJson<T>(val: string | undefined | null, fallback: T): T {
+  if (!val) return fallback;
+  try { return JSON.parse(val); } catch { return fallback; }
 }
 
 export function EditListingForm({ listing, categories, regions }: Props) {
@@ -34,6 +47,10 @@ export function EditListingForm({ listing, categories, regions }: Props) {
   const [success, setSuccess] = useState(false);
   const [category, setCategory] = useState(listing.category || "");
   const [region, setRegion] = useState(listing.region || "");
+  const [services, setServices] = useState<ServiceItem[]>(parseJson(listing.services, []));
+  const [openingHours, setOpeningHours] = useState<OpeningHours>(parseJson(listing.opening_hours, defaultOpeningHours()));
+  const [amenities, setAmenities] = useState<string[]>(parseJson(listing.amenities, []));
+  const [socialLinks, setSocialLinks] = useState<SocialLinks>(parseJson(listing.social_links, emptySocialLinks));
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -54,12 +71,15 @@ export function EditListingForm({ listing, categories, regions }: Props) {
     payload.set("website", fd.get("website") as string || "");
     payload.set("anchor_text", fd.get("anchor_text") as string || "");
     payload.set("description", fd.get("description") as string || "");
-    payload.set("tags", fd.get("tags") as string || "");
+    payload.set("services", JSON.stringify(services));
+    payload.set("opening_hours", JSON.stringify(openingHours));
+    payload.set("amenities", JSON.stringify(amenities));
+    payload.set("social_links", JSON.stringify(socialLinks));
 
     const logo = fd.get("logo") as File;
-    if (logo && logo.size > 0) {
-      payload.set("logo", logo);
-    }
+    if (logo && logo.size > 0) payload.set("logo", logo);
+    const banner = fd.get("banner") as File;
+    if (banner && banner.size > 0) payload.set("banner", banner);
 
     try {
       const res = await fetch(`/api/listings/${listing.id}/update`, {
@@ -97,18 +117,14 @@ export function EditListingForm({ listing, categories, regions }: Props) {
                 <label className="block text-sm font-medium text-text mb-1.5">Category *</label>
                 <select value={category} onChange={(e) => setCategory(e.target.value)} required className={inputClass}>
                   <option value="">Select a category</option>
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
+                  {categories.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
                 </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-text mb-1.5">Region *</label>
                 <select value={region} onChange={(e) => setRegion(e.target.value)} required className={inputClass}>
                   <option value="">Select a region</option>
-                  {regions.map((r) => (
-                    <option key={r.id} value={r.id}>{r.name}</option>
-                  ))}
+                  {regions.map((r) => (<option key={r.id} value={r.id}>{r.name}</option>))}
                 </select>
               </div>
             </div>
@@ -163,16 +179,23 @@ export function EditListingForm({ listing, categories, regions }: Props) {
               />
             </div>
 
+            <ServicesEditor value={services} onChange={setServices} />
+
             <div>
-              <label className="block text-sm font-medium text-text mb-1.5">Tags (comma-separated)</label>
-              <input name="tags" defaultValue={(listing.tags || []).join(", ")} placeholder="web design, branding, Wigan" className={inputClass} />
+              <label className="block text-sm font-medium text-text mb-1.5">Icon Upload</label>
+              <input type="file" name="logo" accept="image/jpeg,image/png" className="w-full text-sm text-text-muted file:mr-4 file:py-2 file:px-4 file:rounded-[var(--radius-btn)] file:border-0 file:text-sm file:font-semibold file:bg-brand-light file:text-brand hover:file:bg-brand-light/80" />
+              <p className="text-xs text-text-muted mt-1">Small square image for cards/header. JPG or PNG, max 2MB. Leave empty to keep current.</p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-text mb-1.5">Logo Upload</label>
-              <input type="file" name="logo" accept="image/jpeg,image/png" className="w-full text-sm text-text-muted file:mr-4 file:py-2 file:px-4 file:rounded-[var(--radius-btn)] file:border-0 file:text-sm file:font-semibold file:bg-brand-light file:text-brand hover:file:bg-brand-light/80" />
-              <p className="text-xs text-text-muted mt-1">JPG or PNG, max 2MB. Leave empty to keep current logo.</p>
+              <label className="block text-sm font-medium text-text mb-1.5">Logo / Banner Upload</label>
+              <input type="file" name="banner" accept="image/jpeg,image/png" className="w-full text-sm text-text-muted file:mr-4 file:py-2 file:px-4 file:rounded-[var(--radius-btn)] file:border-0 file:text-sm file:font-semibold file:bg-brand-light file:text-brand hover:file:bg-brand-light/80" />
+              <p className="text-xs text-text-muted mt-1">Banner/header image for your listing page. JPG or PNG, max 2MB. Leave empty to keep current.</p>
             </div>
+
+            <SocialLinksEditor value={socialLinks} onChange={setSocialLinks} />
+            <OpeningHoursEditor value={openingHours} onChange={setOpeningHours} />
+            <AmenitiesEditor value={amenities} onChange={setAmenities} />
 
             <Button type="submit" size="lg" className="w-full" disabled={loading}>
               {loading ? "Saving…" : "Save Changes"}

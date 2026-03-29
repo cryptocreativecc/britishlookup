@@ -14,7 +14,10 @@ export const businessSchema = z.object({
   website: z.string().url("Enter a valid URL").or(z.literal("")),
   anchor_text: z.string().max(100).optional().or(z.literal("")),
   description: z.string().min(20, "Description must be at least 20 characters").max(1200),
-  tags: z.string().max(500).optional().or(z.literal("")),
+  services: z.string().optional().or(z.literal("")),
+  social_links: z.string().optional().or(z.literal("")),
+  opening_hours: z.string().optional().or(z.literal("")),
+  amenities: z.string().optional().or(z.literal("")),
 });
 
 export const articleSchema = z.object({
