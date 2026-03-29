@@ -4,19 +4,7 @@ import { Button } from "@/components/ui/button";
 import { BusinessCard } from "@/components/directory/business-card";
 import { ArticleCard } from "@/components/blog/article-card";
 import { websiteJsonLd, organizationJsonLd } from "@/lib/jsonld";
-
-const PLACEHOLDER_BUSINESSES = [
-  { name: "Thompson & Sons Builders", slug: "thompson-sons-builders", category: "Building & Construction", town: "Manchester", description: "Family-run building company specialising in extensions, renovations, and new builds across Greater Manchester.", isFeatured: true, isVerified: true },
-  { name: "Bloom & Wild Florists", slug: "bloom-wild-florists", category: "Florists & Gifts", town: "Edinburgh", description: "Beautiful floral arrangements for weddings, events, and everyday occasions. Same-day delivery available.", isFeatured: true },
-  { name: "CloudNine Digital", slug: "cloudnine-digital", category: "Marketing & Media", town: "Bristol", description: "Full-service digital marketing agency. SEO, social media, PPC, and web design for growing businesses.", isVerified: true },
-  { name: "The Green Kitchen", slug: "the-green-kitchen", category: "Food & Drink", town: "Leeds", description: "Award-winning vegetarian café and catering company. Fresh, locally sourced ingredients since 2018." },
-];
-
-const PLACEHOLDER_ARTICLES = [
-  { title: "How to Choose the Right Business Directory for Your Company", slug: "choose-right-business-directory", excerpt: "Not all directories are created equal. Here's what to look for when listing your business online in 2026.", category: "Business", authorName: "BritishLookup Editorial", readTime: 5, publishedAt: "2026-03-25" },
-  { title: "10 Ways Small Businesses Can Boost Local Visibility", slug: "boost-local-visibility", excerpt: "From Google Business Profile to local directories, discover proven strategies to get more customers through your door.", category: "Marketing", authorName: "James Harper", readTime: 7, publishedAt: "2026-03-20" },
-  { title: "The Benefits of a Verified Business Listing", slug: "benefits-verified-listing", excerpt: "A verified listing builds trust with potential customers. Here's why it matters and how to get one.", category: "Business", authorName: "Sarah Mitchell", readTime: 4, publishedAt: "2026-03-18" },
-];
+import { createAdminPb } from "@/lib/pb";
 
 const POPULAR_CATEGORIES = [
   "Builders", "Electricians", "Restaurants", "Accountants", "Web Design", "Plumbers", "Salons", "Solicitors",
@@ -29,7 +17,47 @@ const STATS = [
   { label: "Dofollow Backlinks", value: "✓" },
 ];
 
-export default function HomePage() {
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const pb = await createAdminPb();
+
+  // Fetch featured/recent approved businesses
+  let businesses: { name: string; slug: string; category: string; town: string; description: string; isFeatured?: boolean; isVerified?: boolean }[] = [];
+  try {
+    const result = await pb.collection("businesses").getList(1, 4, {
+      filter: 'status = "approved"',
+      sort: "-is_featured,-created",
+      expand: "category",
+    });
+    businesses = result.items.map((b) => ({
+      name: b.name,
+      slug: b.slug,
+      category: b.expand?.category?.name || "",
+      town: b.town,
+      description: b.description,
+      isFeatured: b.is_featured || false,
+      isVerified: b.is_verified || false,
+    }));
+  } catch { /* */ }
+
+  // Fetch recent published articles
+  let articles: { title: string; slug: string; excerpt: string; category: string; authorName: string; readTime: number; publishedAt: string }[] = [];
+  try {
+    const result = await pb.collection("articles").getList(1, 3, {
+      filter: 'status = "published"',
+      sort: "-published_at",
+    });
+    articles = result.items.map((a) => ({
+      title: a.title,
+      slug: a.slug,
+      excerpt: a.excerpt || a.body?.slice(0, 200) || "",
+      category: "",
+      authorName: a.author_name || "",
+      readTime: a.read_time || 3,
+      publishedAt: a.published_at || a.created,
+    }));
+  } catch { /* */ }
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd()) }} />
@@ -47,9 +75,9 @@ export default function HomePage() {
             tech companies to wedding venues — discover and connect with businesses
             across Britain.
           </p>
-          <div className="mt-8 max-w-xl mx-auto">
+          <form action="/directory" method="GET" className="mt-8 max-w-xl mx-auto">
             <SearchBar />
-          </div>
+          </form>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-sm text-text-muted">
             <span>Popular:</span>
             {POPULAR_CATEGORIES.map((cat) => (
@@ -85,9 +113,15 @@ export default function HomePage() {
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {PLACEHOLDER_BUSINESSES.map((biz) => (
-              <BusinessCard key={biz.slug} {...biz} />
-            ))}
+            {businesses.length > 0 ? (
+              businesses.map((biz) => (
+                <BusinessCard key={biz.slug} {...biz} />
+              ))
+            ) : (
+              <div className="col-span-full text-center py-8 text-text-muted">
+                <p>No businesses listed yet. <Link href="/submit" className="text-brand hover:underline">Be the first!</Link></p>
+              </div>
+            )}
           </div>
           <div className="mt-6 text-center sm:hidden">
             <Link href="/directory" className="text-sm font-semibold text-brand">
@@ -130,11 +164,17 @@ export default function HomePage() {
               Read more →
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {PLACEHOLDER_ARTICLES.map((article) => (
-              <ArticleCard key={article.slug} {...article} />
-            ))}
-          </div>
+          {articles.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {articles.map((article) => (
+                <ArticleCard key={article.slug} {...article} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-text-muted">
+              <p>No articles yet. <Link href="/write-for-us" className="text-brand hover:underline">Write the first one!</Link></p>
+            </div>
+          )}
         </div>
       </section>
 
