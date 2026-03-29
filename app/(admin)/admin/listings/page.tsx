@@ -19,6 +19,7 @@ export default async function AdminListingsPage({
   let listings: {
     id: string;
     name: string;
+    slug: string;
     town: string;
     email: string;
     status: string;
@@ -36,6 +37,7 @@ export default async function AdminListingsPage({
     listings = result.map((r) => ({
       id: r.id,
       name: r.name,
+      slug: r.slug || "",
       town: r.town || "",
       email: r.email || "",
       status: r.status || "pending",
@@ -98,12 +100,12 @@ export default async function AdminListingsPage({
                     <p className="text-xs text-brand mt-0.5">Claimed by {listing.ownerName}</p>
                   )}
                   <p className="text-xs text-text-muted mt-0.5">
-                    {new Date(listing.created).toLocaleDateString("en-GB")}
+                    {listing.created ? new Date(listing.created).toLocaleDateString("en-GB") : "—"}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <Badge className={statusColor[listing.status] || ""}>{listing.status}</Badge>
-                  <ListingActions id={listing.id} currentStatus={listing.status} />
+                  <ListingActions id={listing.id} slug={listing.slug} currentStatus={listing.status} />
                 </div>
               </div>
             </div>

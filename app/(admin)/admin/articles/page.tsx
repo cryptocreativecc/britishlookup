@@ -19,6 +19,7 @@ export default async function AdminArticlesPage({
   let articles: {
     id: string;
     title: string;
+    slug: string;
     author_name: string;
     status: string;
     created: string;
@@ -32,6 +33,7 @@ export default async function AdminArticlesPage({
     articles = result.map((r) => ({
       id: r.id,
       title: r.title,
+      slug: r.slug || "",
       author_name: r.author_name || "",
       status: r.status || "pending",
       created: r.created,
@@ -81,12 +83,12 @@ export default async function AdminArticlesPage({
               <div>
                 <h3 className="font-medium text-text">{article.title}</h3>
                 <p className="text-sm text-text-muted">
-                  by {article.author_name || "Unknown"} · {new Date(article.created).toLocaleDateString("en-GB")}
+                  by {article.author_name || "Unknown"} · {article.created ? new Date(article.created).toLocaleDateString("en-GB") : "—"}
                 </p>
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <Badge className={statusColor[article.status] || ""}>{article.status}</Badge>
-                <ArticleActions id={article.id} currentStatus={article.status} />
+                <ArticleActions id={article.id} slug={article.slug} currentStatus={article.status} />
               </div>
             </div>
           ))}

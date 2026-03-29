@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-export function ListingActions({ id, currentStatus }: { id: string; currentStatus: string }) {
+export function ListingActions({ id, slug, currentStatus }: { id: string; slug: string; currentStatus: string }) {
   const router = useRouter();
   const [loading, setLoading] = useState<string | null>(null);
 
   async function handleAction(action: string) {
+    if (action === "delete" && !confirm("Are you sure you want to delete this listing?")) return;
     setLoading(action);
     try {
       await fetch(`/api/admin/listings/${id}/${action}`, { method: "POST" });
@@ -22,6 +24,14 @@ export function ListingActions({ id, currentStatus }: { id: string; currentStatu
 
   return (
     <div className="flex gap-1">
+      {slug && (
+        <Link href={`/directory/${slug}`} target="_blank">
+          <Button size="sm" variant="outline" title="Preview">👁</Button>
+        </Link>
+      )}
+      <Link href={`/admin/listings/${id}/edit`}>
+        <Button size="sm" variant="outline" title="Edit">✎</Button>
+      </Link>
       {currentStatus !== "approved" && (
         <Button size="sm" onClick={() => handleAction("approve")} disabled={loading !== null}>
           {loading === "approve" ? "…" : "✓"}
