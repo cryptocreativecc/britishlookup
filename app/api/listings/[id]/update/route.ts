@@ -36,12 +36,18 @@ export async function POST(
       email: form.get("email"),
       phone: form.get("phone") || "",
       website: form.get("website") || "",
+      anchor_text: form.get("anchor_text") || "",
       town: form.get("town"),
       postcode: form.get("postcode"),
       address: form.get("address") || "",
       description: form.get("description"),
       tags,
     };
+
+    const cat = form.get("category") as string;
+    const reg = form.get("region") as string;
+    if (cat) updateData.category = cat;
+    if (reg) updateData.region = reg;
 
     const logo = form.get("logo") as File;
     if (logo && logo.size > 0) {

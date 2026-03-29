@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
+const inputClass = "w-full h-11 px-4 rounded-[var(--radius-btn)] border border-border bg-white text-text focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand";
+
 interface Props {
   listing: {
     id: string;
@@ -13,18 +15,25 @@ interface Props {
     phone: string;
     email: string;
     website: string;
+    anchor_text: string;
     address: string;
     town: string;
     postcode: string;
     tags: string[];
+    category: string;
+    region: string;
   };
+  categories: { id: string; name: string }[];
+  regions: { id: string; name: string }[];
 }
 
-export function EditListingForm({ listing }: Props) {
+export function EditListingForm({ listing, categories, regions }: Props) {
   const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [category, setCategory] = useState(listing.category || "");
+  const [region, setRegion] = useState(listing.region || "");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -32,11 +41,30 @@ export function EditListingForm({ listing }: Props) {
     setError("");
     setSuccess(false);
 
-    const form = new FormData(e.currentTarget);
+    const fd = new FormData(e.currentTarget);
+    const payload = new FormData();
+    payload.set("name", fd.get("name") as string || "");
+    payload.set("category", category);
+    payload.set("region", region);
+    payload.set("town", fd.get("town") as string || "");
+    payload.set("postcode", fd.get("postcode") as string || "");
+    payload.set("address", fd.get("address") as string || "");
+    payload.set("phone", fd.get("phone") as string || "");
+    payload.set("email", fd.get("email") as string || "");
+    payload.set("website", fd.get("website") as string || "");
+    payload.set("anchor_text", fd.get("anchor_text") as string || "");
+    payload.set("description", fd.get("description") as string || "");
+    payload.set("tags", fd.get("tags") as string || "");
+
+    const logo = fd.get("logo") as File;
+    if (logo && logo.size > 0) {
+      payload.set("logo", logo);
+    }
+
     try {
       const res = await fetch(`/api/listings/${listing.id}/update`, {
         method: "POST",
-        body: form,
+        body: payload,
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Update failed");
@@ -49,8 +77,6 @@ export function EditListingForm({ listing }: Props) {
     }
   }
 
-  const inputClass = "w-full h-11 px-4 rounded-[var(--radius-btn)] border border-border bg-white text-text focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand";
-
   return (
     <div>
       <h1 className="text-2xl font-bold text-text mb-6">Edit: {listing.name}</h1>
@@ -60,56 +86,95 @@ export function EditListingForm({ listing }: Props) {
           {error && <div className="mb-4 rounded-lg bg-red-50 text-red-700 p-3 text-sm">{error}</div>}
           {success && <div className="mb-4 rounded-lg bg-green-50 text-green-700 p-3 text-sm">Listing updated!</div>}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className="block text-sm font-medium text-text mb-1.5">Business Name *</label>
+              <input name="name" defaultValue={listing.name} required className={inputClass} />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
-                <label className="block text-sm font-medium text-text mb-1.5">Business Name</label>
-                <input name="name" defaultValue={listing.name} required className={inputClass} />
+                <label className="block text-sm font-medium text-text mb-1.5">Category *</label>
+                <select value={category} onChange={(e) => setCategory(e.target.value)} required className={inputClass}>
+                  <option value="">Select a category</option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-text mb-1.5">Email</label>
-                <input name="email" type="email" defaultValue={listing.email} required className={inputClass} />
+                <label className="block text-sm font-medium text-text mb-1.5">Region *</label>
+                <select value={region} onChange={(e) => setRegion(e.target.value)} required className={inputClass}>
+                  <option value="">Select a region</option>
+                  {regions.map((r) => (
+                    <option key={r.id} value={r.id}>{r.name}</option>
+                  ))}
+                </select>
               </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
-                <label className="block text-sm font-medium text-text mb-1.5">Phone</label>
-                <input name="phone" type="tel" defaultValue={listing.phone} className={inputClass} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-text mb-1.5">Website</label>
-                <input name="website" type="url" defaultValue={listing.website} className={inputClass} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-text mb-1.5">Town</label>
+                <label className="block text-sm font-medium text-text mb-1.5">Town / City *</label>
                 <input name="town" defaultValue={listing.town} required className={inputClass} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-text mb-1.5">Postcode</label>
+                <label className="block text-sm font-medium text-text mb-1.5">Postcode *</label>
                 <input name="postcode" defaultValue={listing.postcode} required className={inputClass} />
               </div>
             </div>
+
             <div>
-              <label className="block text-sm font-medium text-text mb-1.5">Address</label>
+              <label className="block text-sm font-medium text-text mb-1.5">Full Address</label>
               <input name="address" defaultValue={listing.address} className={inputClass} />
             </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-sm font-medium text-text mb-1.5">Phone Number</label>
+                <input name="phone" type="tel" defaultValue={listing.phone} className={inputClass} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-text mb-1.5">Email Address *</label>
+                <input name="email" type="email" defaultValue={listing.email} required className={inputClass} />
+              </div>
+            </div>
+
             <div>
-              <label className="block text-sm font-medium text-text mb-1.5">Description</label>
+              <label className="block text-sm font-medium text-text mb-1.5">Website URL</label>
+              <input name="website" defaultValue={listing.website} placeholder="https://example.com" className={inputClass} />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-text mb-1.5">Website Anchor Text</label>
+              <input name="anchor_text" defaultValue={listing.anchor_text} placeholder="e.g. Wigan Plumbing Services" className={inputClass} />
+              <p className="text-xs text-text-muted mt-1">Keyword-relevant text for your website link. If empty, your domain name will be used.</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-text mb-1.5">Business Description *</label>
               <textarea
                 name="description"
                 defaultValue={listing.description}
                 required
                 rows={4}
-                className="w-full px-4 py-3 rounded-[var(--radius-btn)] border border-border bg-white text-text focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand"
+                maxLength={1200}
+                className="w-full px-4 py-3 rounded-[var(--radius-btn)] border border-border bg-white text-text focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand resize-none"
               />
             </div>
+
             <div>
               <label className="block text-sm font-medium text-text mb-1.5">Tags (comma-separated)</label>
-              <input name="tags" defaultValue={(listing.tags || []).join(", ")} className={inputClass} />
+              <input name="tags" defaultValue={(listing.tags || []).join(", ")} placeholder="web design, branding, Wigan" className={inputClass} />
             </div>
+
             <div>
-              <label className="block text-sm font-medium text-text mb-1.5">New Logo</label>
-              <input name="logo" type="file" accept="image/*" className="text-sm" />
+              <label className="block text-sm font-medium text-text mb-1.5">Logo Upload</label>
+              <input type="file" name="logo" accept="image/jpeg,image/png" className="w-full text-sm text-text-muted file:mr-4 file:py-2 file:px-4 file:rounded-[var(--radius-btn)] file:border-0 file:text-sm file:font-semibold file:bg-brand-light file:text-brand hover:file:bg-brand-light/80" />
+              <p className="text-xs text-text-muted mt-1">JPG or PNG, max 2MB. Leave empty to keep current logo.</p>
             </div>
-            <Button type="submit" size="lg" disabled={loading}>
+
+            <Button type="submit" size="lg" className="w-full" disabled={loading}>
               {loading ? "Saving…" : "Save Changes"}
             </Button>
           </form>
