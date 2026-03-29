@@ -13,7 +13,9 @@ export const baseMetadata: Metadata = {
   },
   description: DEFAULT_DESC,
   icons: {
-    icon: "/British-Lookup-Favicon.svg",
+    icon: [
+      { url: "/British-Lookup-Favicon.svg", type: "image/svg+xml" },
+    ],
     shortcut: "/British-Lookup-Favicon.svg",
     apple: "/British-Lookup-Favicon.svg",
   },
@@ -21,6 +23,12 @@ export const baseMetadata: Metadata = {
     type: "website",
     siteName: SITE_NAME,
     locale: "en_GB",
+    url: BASE_URL,
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@britishlookup",
+    creator: "@britishlookup",
   },
   robots: {
     index: true,
