@@ -6,6 +6,9 @@ import { ContactCard } from "@/components/directory/contact-card";
 import { ReviewsSection } from "@/components/directory/reviews-section";
 import { ApprovedSeal } from "@/components/ui/approved-seal";
 import { ServicesDisplay } from "@/components/directory/services-display";
+import { ImageGallery } from "@/components/directory/image-gallery";
+import { TeamMembers } from "@/components/directory/team-members";
+import { FAQDisplay } from "@/components/directory/faq-display";
 import { ListingMap } from "@/components/directory/listing-map";
 import { createAdminPb } from "@/lib/pb";
 import { listingMeta } from "@/lib/seo";
@@ -78,6 +81,12 @@ export default async function ListingPage({ params }: { params: Promise<{ slug: 
   );
   const socialLinks = parseJSON<Record<string, string>>(biz.social_links, {});
   const amenities = parseJSON<string[]>(biz.amenities, []);
+  const teamMembers = parseJSON<{ name: string; role: string; photo: string; linkedin: string; twitter: string }[]>(biz.team_members, []);
+  const faqs = parseJSON<{ question: string; answer: string }[]>(biz.faqs, []);
+  const youtubeUrl = biz.youtube_url || "";
+  const galleryImages = Array.isArray(biz.gallery)
+    ? biz.gallery.map((f: string) => `https://pb.britishlookup.co.uk/api/files/businesses/${biz.id}/${f}`)
+    : [];
   const hasSocials = Object.values(socialLinks).some((v) => !!v);
   const hasHours = Object.values(openingHours).some((d) => d?.isOpen);
 
@@ -143,6 +152,46 @@ export default async function ListingPage({ params }: { params: Promise<{ slug: 
               <div className="mt-8">
                 <h2 className="text-lg font-semibold text-text mb-3">Services</h2>
                 <ServicesDisplay services={services} />
+              </div>
+            )}
+
+            {/* Gallery */}
+            {galleryImages.length > 0 && (
+              <div className="mt-8">
+                <h2 className="text-lg font-semibold text-text mb-3">Gallery</h2>
+                <ImageGallery images={galleryImages} businessName={biz.name} />
+              </div>
+            )}
+
+            {/* Video */}
+            {youtubeUrl && (
+              <div className="mt-8">
+                <h2 className="text-lg font-semibold text-text mb-3">Video</h2>
+                <div className="aspect-video rounded-lg overflow-hidden border border-border">
+                  <iframe
+                    src={youtubeUrl.replace("watch?v=", "embed/").replace("youtu.be/", "youtube.com/embed/")}
+                    title={`${biz.name} video`}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="w-full h-full"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Team */}
+            {teamMembers.length > 0 && (
+              <div className="mt-8">
+                <h2 className="text-lg font-semibold text-text mb-3">Meet the Team</h2>
+                <TeamMembers members={teamMembers} />
+              </div>
+            )}
+
+            {/* FAQs */}
+            {faqs.length > 0 && (
+              <div className="mt-8">
+                <h2 className="text-lg font-semibold text-text mb-3">Frequently Asked Questions</h2>
+                <FAQDisplay faqs={faqs} />
               </div>
             )}
 

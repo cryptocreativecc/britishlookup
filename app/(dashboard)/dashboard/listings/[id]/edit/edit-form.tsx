@@ -8,6 +8,8 @@ import { ServicesEditor, type ServiceItem } from "@/components/forms/services-ed
 import { OpeningHoursEditor, defaultOpeningHours, type OpeningHours } from "@/components/forms/opening-hours-editor";
 import { AmenitiesEditor } from "@/components/forms/amenities-editor";
 import { SocialLinksEditor, emptySocialLinks, type SocialLinks } from "@/components/forms/social-links-editor";
+import { TeamMembersEditor, type TeamMemberInput } from "@/components/forms/team-members-editor";
+import { FAQEditor, type FAQInput } from "@/components/forms/faq-editor";
 
 const inputClass = "w-full h-11 px-4 rounded-[var(--radius-btn)] border border-border bg-white text-text focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand";
 
@@ -30,6 +32,9 @@ interface Props {
     opening_hours?: string;
     amenities?: string;
     social_links?: string;
+    youtube_url?: string;
+    team_members?: string;
+    faqs?: string;
   };
   categories: { id: string; name: string }[];
   regions: { id: string; name: string }[];
@@ -64,6 +69,8 @@ export function EditListingForm({ listing, categories, regions }: Props) {
   });
   const [amenities, setAmenities] = useState<string[]>(parseJson(listing.amenities, []));
   const [socialLinks, setSocialLinks] = useState<SocialLinks>(parseJson(listing.social_links, emptySocialLinks));
+  const [teamMembers, setTeamMembers] = useState<TeamMemberInput[]>(parseJson(listing.team_members, []));
+  const [faqs, setFaqs] = useState<FAQInput[]>(parseJson(listing.faqs, []));
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -88,11 +95,16 @@ export function EditListingForm({ listing, categories, regions }: Props) {
     payload.set("opening_hours", JSON.stringify(openingHours));
     payload.set("amenities", JSON.stringify(amenities));
     payload.set("social_links", JSON.stringify(socialLinks));
+    payload.set("youtube_url", fd.get("youtube_url") as string || "");
+    payload.set("team_members", JSON.stringify(teamMembers.filter((m) => m.name)));
+    payload.set("faqs", JSON.stringify(faqs.filter((f) => f.question && f.answer)));
 
     const logo = fd.get("logo") as File;
     if (logo && logo.size > 0) payload.set("logo", logo);
     const banner = fd.get("banner") as File;
     if (banner && banner.size > 0) payload.set("banner", banner);
+    const galleryFiles = fd.getAll("gallery") as File[];
+    galleryFiles.forEach((f) => { if (f.size > 0) payload.append("gallery", f); });
 
     try {
       const res = await fetch(`/api/listings/${listing.id}/update`, {
@@ -205,6 +217,20 @@ export function EditListingForm({ listing, categories, regions }: Props) {
               <input type="file" name="banner" accept="image/jpeg,image/png" className="w-full text-sm text-text-muted file:mr-4 file:py-2 file:px-4 file:rounded-[var(--radius-btn)] file:border-0 file:text-sm file:font-semibold file:bg-brand-light file:text-brand hover:file:bg-brand-light/80" />
               <p className="text-xs text-text-muted mt-1">Banner/header image for your listing page. JPG or PNG, max 2MB. Leave empty to keep current.</p>
             </div>
+
+            <div>
+              <label className="block text-sm font-medium text-text mb-1.5">Image Gallery (up to 6)</label>
+              <input type="file" name="gallery" accept="image/jpeg,image/png,image/webp" multiple className="w-full text-sm text-text-muted file:mr-4 file:py-2 file:px-4 file:rounded-[var(--radius-btn)] file:border-0 file:text-sm file:font-semibold file:bg-brand-light file:text-brand hover:file:bg-brand-light/80" />
+              <p className="text-xs text-text-muted mt-1">Select up to 6 photos. Leave empty to keep current.</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-text mb-1.5">YouTube Video URL</label>
+              <input name="youtube_url" defaultValue={listing.youtube_url as string || ""} placeholder="https://youtube.com/watch?v=..." className={inputClass} />
+            </div>
+
+            <TeamMembersEditor value={teamMembers} onChange={setTeamMembers} />
+            <FAQEditor value={faqs} onChange={setFaqs} />
 
             <SocialLinksEditor value={socialLinks} onChange={setSocialLinks} />
             <OpeningHoursEditor value={openingHours} onChange={setOpeningHours} />

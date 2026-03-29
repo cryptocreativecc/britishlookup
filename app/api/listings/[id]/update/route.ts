@@ -41,6 +41,9 @@ export async function POST(
       social_links: form.get("social_links") || "{}",
       opening_hours: form.get("opening_hours") || "{}",
       amenities: form.get("amenities") || "[]",
+      youtube_url: form.get("youtube_url") || "",
+      team_members: form.get("team_members") || "[]",
+      faqs: form.get("faqs") || "[]",
     };
 
     const cat = form.get("category") as string;
@@ -52,6 +55,8 @@ export async function POST(
     if (logo && logo.size > 0) updateData.logo = logo;
     const banner = form.get("banner") as File;
     if (banner && banner.size > 0) updateData.banner = banner;
+    const gallery = form.getAll("gallery") as File[];
+    gallery.forEach((f) => { if (f.size > 0) { if (!updateData.gallery) updateData.gallery = []; (updateData.gallery as File[]).push(f); } });
 
     await adminPb.collection("businesses").update(id, updateData);
     return NextResponse.json({ success: true });

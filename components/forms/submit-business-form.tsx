@@ -7,6 +7,8 @@ import { ServicesEditor, type ServiceItem } from "./services-editor";
 import { OpeningHoursEditor, defaultOpeningHours, type OpeningHours } from "./opening-hours-editor";
 import { AmenitiesEditor } from "./amenities-editor";
 import { SocialLinksEditor, emptySocialLinks, type SocialLinks } from "./social-links-editor";
+import { TeamMembersEditor, type TeamMemberInput } from "./team-members-editor";
+import { FAQEditor, type FAQInput } from "./faq-editor";
 
 const inputClass = "w-full h-11 px-4 rounded-[var(--radius-btn)] border border-border bg-white text-text focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand";
 
@@ -27,6 +29,8 @@ export function SubmitBusinessForm({ categories = [], regions = [], redirectTo }
   const [openingHours, setOpeningHours] = useState<OpeningHours>(defaultOpeningHours());
   const [amenities, setAmenities] = useState<string[]>([]);
   const [socialLinks, setSocialLinks] = useState<SocialLinks>(emptySocialLinks);
+  const [teamMembers, setTeamMembers] = useState<TeamMemberInput[]>([]);
+  const [faqs, setFaqs] = useState<FAQInput[]>([]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -53,11 +57,16 @@ export function SubmitBusinessForm({ categories = [], regions = [], redirectTo }
     payload.set("opening_hours", JSON.stringify(openingHours));
     payload.set("amenities", JSON.stringify(amenities));
     payload.set("social_links", JSON.stringify(socialLinks));
+    payload.set("youtube_url", fd.get("youtube_url") as string || "");
+    payload.set("team_members", JSON.stringify(teamMembers.filter((m) => m.name)));
+    payload.set("faqs", JSON.stringify(faqs.filter((f) => f.question && f.answer)));
 
     const logo = fd.get("logo") as File;
     if (logo && logo.size > 0) payload.set("logo", logo);
     const banner = fd.get("banner") as File;
     if (banner && banner.size > 0) payload.set("banner", banner);
+    const galleryFiles = fd.getAll("gallery") as File[];
+    galleryFiles.forEach((f) => { if (f.size > 0) payload.append("gallery", f); });
 
     try {
       const res = await fetch("/api/submit-business", { method: "POST", body: payload });
@@ -165,6 +174,17 @@ export function SubmitBusinessForm({ categories = [], regions = [], redirectTo }
         <input type="file" name="banner" accept="image/jpeg,image/png" className="w-full text-sm text-text-muted file:mr-4 file:py-2 file:px-4 file:rounded-[var(--radius-btn)] file:border-0 file:text-sm file:font-semibold file:bg-brand-light file:text-brand hover:file:bg-brand-light/80" />
         <p className="text-xs text-text-muted mt-1">Banner/header image displayed on your listing page. JPG or PNG, max 2MB</p>
       </div>
+
+      <div>
+        <label className="block text-sm font-medium text-text mb-1.5">Image Gallery (up to 6)</label>
+        <input type="file" name="gallery" accept="image/jpeg,image/png,image/webp" multiple className="w-full text-sm text-text-muted file:mr-4 file:py-2 file:px-4 file:rounded-[var(--radius-btn)] file:border-0 file:text-sm file:font-semibold file:bg-brand-light file:text-brand hover:file:bg-brand-light/80" />
+        <p className="text-xs text-text-muted mt-1">Select up to 6 photos. JPG, PNG or WebP, max 5MB each.</p>
+      </div>
+
+      <Field label="YouTube Video URL" name="youtube_url" placeholder="https://youtube.com/watch?v=..." />
+
+      <TeamMembersEditor value={teamMembers} onChange={setTeamMembers} />
+      <FAQEditor value={faqs} onChange={setFaqs} />
 
       <SocialLinksEditor value={socialLinks} onChange={setSocialLinks} />
       <OpeningHoursEditor value={openingHours} onChange={setOpeningHours} />

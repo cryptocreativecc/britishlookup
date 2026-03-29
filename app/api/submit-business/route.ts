@@ -88,6 +88,9 @@ export async function POST(req: Request) {
       social_links: data.social_links || "{}",
       opening_hours: data.opening_hours || "{}",
       amenities: data.amenities || "[]",
+      youtube_url: formData.get("youtube_url") as string || "",
+      team_members: formData.get("team_members") as string || "[]",
+      faqs: formData.get("faqs") as string || "[]",
       status: "pending",
       lat: geo?.lat || 0,
       lng: geo?.lng || 0,
@@ -107,6 +110,8 @@ export async function POST(req: Request) {
       if (logo && logo.size > 0) { fileForm.append("logo", logo); hasFiles = true; }
       const banner = formData.get("banner") as File | null;
       if (banner && banner.size > 0) { fileForm.append("banner", banner); hasFiles = true; }
+      const gallery = formData.getAll("gallery") as File[];
+      gallery.forEach((f) => { if (f.size > 0) { fileForm.append("gallery", f); hasFiles = true; } });
       if (hasFiles) await pb.collection("businesses").update(record.id, fileForm);
 
       return NextResponse.json({ success: true, message: "Business submitted for review" });
