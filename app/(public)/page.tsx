@@ -6,23 +6,27 @@ import { ArticleCard } from "@/components/blog/article-card";
 import { websiteJsonLd, organizationJsonLd } from "@/lib/jsonld";
 
 const PLACEHOLDER_BUSINESSES = [
-  { name: "Thompson Roofing", slug: "thompson-roofing", category: "Roofing", town: "Manchester", description: "Professional roofing services across Greater Manchester. Flat roofs, pitched roofs, repairs and maintenance.", isFeatured: true, isVerified: true },
-  { name: "T Roofing Supplies", slug: "t-roofing-supplies", category: "Roofing Supplies", town: "Birmingham", description: "Quality roofing materials and supplies delivered across the UK. Trade accounts welcome.", isFeatured: true },
-  { name: "Castle Guttering", slug: "castle-guttering", category: "Guttering", town: "Leeds", description: "Guttering installation, cleaning and repair. UPVC, aluminium and cast iron specialists.", isVerified: true },
-  { name: "Greenfield Builders", slug: "greenfield-builders", category: "Building", town: "Bristol", description: "Family-run building company. Extensions, renovations, and new builds with a 10-year guarantee." },
+  { name: "Thompson & Sons Builders", slug: "thompson-sons-builders", category: "Building & Construction", town: "Manchester", description: "Family-run building company specialising in extensions, renovations, and new builds across Greater Manchester.", isFeatured: true, isVerified: true },
+  { name: "Bloom & Wild Florists", slug: "bloom-wild-florists", category: "Florists & Gifts", town: "Edinburgh", description: "Beautiful floral arrangements for weddings, events, and everyday occasions. Same-day delivery available.", isFeatured: true },
+  { name: "CloudNine Digital", slug: "cloudnine-digital", category: "Marketing & Media", town: "Bristol", description: "Full-service digital marketing agency. SEO, social media, PPC, and web design for growing businesses.", isVerified: true },
+  { name: "The Green Kitchen", slug: "the-green-kitchen", category: "Food & Drink", town: "Leeds", description: "Award-winning vegetarian café and catering company. Fresh, locally sourced ingredients since 2018." },
 ];
 
 const PLACEHOLDER_ARTICLES = [
-  { title: "How to Choose a Reliable Roofer in 2026", slug: "choose-reliable-roofer-2026", excerpt: "Finding a trustworthy roofer doesn't have to be stressful. Here's what to look for and the questions to ask before hiring.", category: "Roofing", authorName: "BritishLookup Editorial", readTime: 5, publishedAt: "2026-03-25" },
-  { title: "The Complete Guide to Guttering Maintenance", slug: "guttering-maintenance-guide", excerpt: "Regular guttering maintenance prevents costly damage. Learn when to clean, repair, and replace your gutters.", category: "Guttering", authorName: "James Harper", readTime: 7, publishedAt: "2026-03-20" },
-  { title: "Why Every UK Trade Business Needs an Online Presence", slug: "uk-trade-business-online-presence", excerpt: "If you're a tradesperson without a website, you're leaving money on the table. Here's why digital visibility matters.", category: "Business", authorName: "Sarah Mitchell", readTime: 4, publishedAt: "2026-03-18" },
+  { title: "How to Choose the Right Business Directory for Your Company", slug: "choose-right-business-directory", excerpt: "Not all directories are created equal. Here's what to look for when listing your business online in 2026.", category: "Business", authorName: "BritishLookup Editorial", readTime: 5, publishedAt: "2026-03-25" },
+  { title: "10 Ways Small Businesses Can Boost Local Visibility", slug: "boost-local-visibility", excerpt: "From Google Business Profile to local directories, discover proven strategies to get more customers through your door.", category: "Marketing", authorName: "James Harper", readTime: 7, publishedAt: "2026-03-20" },
+  { title: "The Benefits of a Verified Business Listing", slug: "benefits-verified-listing", excerpt: "A verified listing builds trust with potential customers. Here's why it matters and how to get one.", category: "Business", authorName: "Sarah Mitchell", readTime: 4, publishedAt: "2026-03-18" },
+];
+
+const POPULAR_CATEGORIES = [
+  "Builders", "Electricians", "Restaurants", "Accountants", "Web Design", "Plumbers", "Salons", "Solicitors",
 ];
 
 const STATS = [
-  { label: "Businesses Listed", value: "500+" },
-  { label: "Articles Published", value: "120+" },
-  { label: "Categories", value: "50+" },
-  { label: "UK Regions", value: "12" },
+  { label: "Business Categories", value: "49" },
+  { label: "UK Regions", value: "53" },
+  { label: "Free Listings", value: "100%" },
+  { label: "Dofollow Backlinks", value: "✓" },
 ];
 
 export default function HomePage() {
@@ -35,29 +39,28 @@ export default function HomePage() {
       <section className="bg-gradient-to-b from-brand-light/50 to-white py-20 sm:py-28">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-text">
-            Find trusted{" "}
+            Find &amp; list{" "}
             <span className="text-brand">UK businesses</span>
           </h1>
           <p className="mt-4 text-lg sm:text-xl text-text-muted max-w-2xl mx-auto">
-            Your directory for verified tradespeople, suppliers, and local
-            services across Britain.
+            The free UK business directory. From local tradespeople to restaurants,
+            tech companies to wedding venues — discover and connect with businesses
+            across Britain.
           </p>
           <div className="mt-8 max-w-xl mx-auto">
             <SearchBar />
           </div>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-sm text-text-muted">
             <span>Popular:</span>
-            {["Roofing", "Guttering", "Building", "Plumbing", "Electrical"].map(
-              (cat) => (
-                <Link
-                  key={cat}
-                  href={`/directory?category=${cat.toLowerCase()}`}
-                  className="px-3 py-1 bg-white border border-border rounded-full hover:border-brand hover:text-brand transition-colors"
-                >
-                  {cat}
-                </Link>
-              )
-            )}
+            {POPULAR_CATEGORIES.map((cat) => (
+              <Link
+                key={cat}
+                href={`/directory?q=${encodeURIComponent(cat.toLowerCase())}`}
+                className="px-3 py-1 bg-white border border-border rounded-full hover:border-brand hover:text-brand transition-colors"
+              >
+                {cat}
+              </Link>
+            ))}
           </div>
         </div>
       </section>
@@ -71,7 +74,7 @@ export default function HomePage() {
                 Featured Businesses
               </h2>
               <p className="mt-1 text-text-muted">
-                Verified and trusted businesses across the UK
+                Discover businesses across every industry and region
               </p>
             </div>
             <Link
@@ -117,7 +120,7 @@ export default function HomePage() {
                 Latest Articles
               </h2>
               <p className="mt-1 text-text-muted">
-                Guides, tips, and insights for UK trades and homeowners
+                Guides, tips, and insights for UK businesses and consumers
               </p>
             </div>
             <Link
@@ -139,12 +142,12 @@ export default function HomePage() {
       <section className="bg-surface py-16 sm:py-20">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold text-text">
-            Get your business listed for free
+            List your business for free
           </h2>
           <p className="mt-3 text-text-muted max-w-xl mx-auto">
-            Join hundreds of UK businesses on BritishLookup. Get a verified
-            listing page with a dofollow backlink to your website — completely
-            free.
+            Whatever your industry, wherever you&apos;re based in the UK — get a
+            free listing with a dofollow backlink to your website. No catch,
+            no subscription.
           </p>
           <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link href="/submit">

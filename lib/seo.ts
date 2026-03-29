@@ -3,12 +3,12 @@ import type { Metadata } from "next";
 const BASE_URL = "https://britishlookup.co.uk";
 const SITE_NAME = "BritishLookup";
 const DEFAULT_DESC =
-  "Find trusted UK businesses — your directory for tradespeople, suppliers, and local services across Britain.";
+  "The free UK business directory. Find and list businesses across every industry and region — from local trades to restaurants, tech companies to wedding venues.";
 
 export const baseMetadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: `${SITE_NAME} — UK Business Directory & Trades Guide`,
+    default: `${SITE_NAME} — Free UK Business Directory`,
     template: `%s | ${SITE_NAME}`,
   },
   description: DEFAULT_DESC,

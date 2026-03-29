@@ -1,64 +1,114 @@
-import Link from "next/link";
+import { createAdminPb } from "@/lib/pb";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { ListingActions } from "./listing-actions";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Manage Listings" };
+export const metadata: Metadata = { title: "Listings — Admin" };
 
-// Placeholder data — will be replaced with PocketBase query
-const LISTINGS = [
-  { id: "1", name: "Thompson Roofing", category: "Roofing", town: "Manchester", status: "approved", is_verified: true, created: "2026-03-20" },
-  { id: "2", name: "Castle Guttering", category: "Guttering", town: "Leeds", status: "pending", is_verified: false, created: "2026-03-25" },
-  { id: "3", name: "Greenfield Builders", category: "Building", town: "Bristol", status: "approved", is_verified: true, created: "2026-03-18" },
-  { id: "4", name: "Spark Electrical", category: "Electrical", town: "London", status: "pending", is_verified: false, created: "2026-03-27" },
-  { id: "5", name: "Dodgy Dave Roofing", category: "Roofing", town: "Stoke", status: "rejected", is_verified: false, created: "2026-03-22" },
-];
+export default async function AdminListingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string }>;
+}) {
+  const { status: filterStatus } = await searchParams;
+  const pb = await createAdminPb();
 
-const statusColor: Record<string, string> = {
-  pending: "bg-amber-100 text-amber-800",
-  approved: "bg-green-100 text-green-800",
-  rejected: "bg-red-100 text-red-800",
-  featured: "bg-purple-100 text-purple-800",
-};
+  const filter = filterStatus ? `status="${filterStatus}"` : "";
 
-export default function AdminListingsPage() {
+  let listings: {
+    id: string;
+    name: string;
+    town: string;
+    email: string;
+    status: string;
+    claimed: boolean;
+    ownerName: string;
+    created: string;
+  }[] = [];
+
+  try {
+    const result = await pb.collection("businesses").getFullList({
+      sort: "-created",
+      filter,
+      expand: "owner",
+    });
+    listings = result.map((r) => ({
+      id: r.id,
+      name: r.name,
+      town: r.town || "",
+      email: r.email || "",
+      status: r.status || "pending",
+      claimed: r.claimed || false,
+      ownerName: r.expand?.owner?.name || "",
+      created: r.created,
+    }));
+  } catch { /* collection may not exist */ }
+
+  const statusColor: Record<string, string> = {
+    pending: "bg-yellow-100 text-yellow-800",
+    approved: "bg-green-100 text-green-800",
+    featured: "bg-purple-100 text-purple-800",
+    rejected: "bg-red-100 text-red-800",
+  };
+
+  const filters = [
+    { label: "All", value: "" },
+    { label: "Pending", value: "pending" },
+    { label: "Approved", value: "approved" },
+    { label: "Featured", value: "featured" },
+    { label: "Rejected", value: "rejected" },
+  ];
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div>
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-text">Manage Listings</h1>
-          <p className="text-text-muted text-sm">{LISTINGS.length} listings</p>
-        </div>
-        <Link href="/admin" className="text-sm text-brand hover:text-brand-dark">← Dashboard</Link>
+        <h1 className="text-2xl font-bold text-text">Listings ({listings.length})</h1>
       </div>
 
-      <div className="space-y-3">
-        {LISTINGS.map((listing) => (
-          <Link key={listing.id} href={`/admin/listings/${listing.id}`}>
-            <Card className="hover:border-brand/30">
-              <CardContent>
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-[var(--radius-btn)] bg-brand-light flex items-center justify-center text-brand font-bold shrink-0">
-                      {listing.name.charAt(0)}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="font-semibold text-text truncate">{listing.name}</p>
-                      <p className="text-sm text-text-muted">{listing.category} · {listing.town}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    {listing.is_verified && <Badge variant="outline">✓ Verified</Badge>}
-                    <span className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${statusColor[listing.status]}`}>
-                      {listing.status}
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
+      <div className="flex gap-2 mb-4">
+        {filters.map((f) => (
+          <a
+            key={f.value}
+            href={f.value ? `/admin/listings?status=${f.value}` : "/admin/listings"}
+            className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${
+              (filterStatus || "") === f.value
+                ? "bg-brand text-white border-brand"
+                : "bg-white text-text-muted border-border hover:border-brand"
+            }`}
+          >
+            {f.label}
+          </a>
         ))}
       </div>
+
+      {listings.length === 0 ? (
+        <p className="text-text-muted py-8 text-center">No listings found.</p>
+      ) : (
+        <div className="space-y-3">
+          {listings.map((listing) => (
+            <div key={listing.id} className="bg-white p-4 rounded-lg border border-border">
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0">
+                  <h3 className="font-medium text-text">{listing.name}</h3>
+                  <p className="text-sm text-text-muted">
+                    {listing.town}{listing.email ? ` · ${listing.email}` : ""}
+                  </p>
+                  {listing.claimed && listing.ownerName && (
+                    <p className="text-xs text-brand mt-0.5">Claimed by {listing.ownerName}</p>
+                  )}
+                  <p className="text-xs text-text-muted mt-0.5">
+                    {new Date(listing.created).toLocaleDateString("en-GB")}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <Badge className={statusColor[listing.status] || ""}>{listing.status}</Badge>
+                  <ListingActions id={listing.id} currentStatus={listing.status} />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
