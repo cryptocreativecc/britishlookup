@@ -60,6 +60,7 @@ export default async function DirectoryPage({
     isFeatured: boolean;
     isVerified: boolean;
     logo: string;
+    banner: string;
   }[] = [];
   let totalItems = 0;
   let totalPages = 1;
@@ -80,6 +81,7 @@ export default async function DirectoryPage({
       isFeatured: b.status === "featured" || b.is_featured,
       isVerified: b.is_verified || false,
       logo: b.logo ? `https://pb.britishlookup.co.uk/api/files/businesses/${b.id}/${b.logo}` : "",
+      banner: b.banner ? `https://pb.britishlookup.co.uk/api/files/businesses/${b.id}/${b.banner}` : "",
     }));
     totalItems = result.totalItems;
     totalPages = result.totalPages;
@@ -197,7 +199,7 @@ export default async function DirectoryPage({
                 category={biz.categoryName}
                 isFeatured={biz.isFeatured}
                 isVerified={biz.isVerified}
-                icon={biz.logo}
+                banner={biz.banner || biz.logo}
               />
             ))}
           </div>

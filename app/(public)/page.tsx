@@ -23,7 +23,7 @@ export default async function HomePage() {
   const pb = await createAdminPb();
 
   // Fetch featured/recent approved businesses
-  let businesses: { name: string; slug: string; category: string; town: string; description: string; isFeatured?: boolean; isVerified?: boolean; icon?: string }[] = [];
+  let businesses: { name: string; slug: string; category: string; town: string; description: string; isFeatured?: boolean; isVerified?: boolean; banner?: string }[] = [];
   try {
     const result = await pb.collection("businesses").getList(1, 4, {
       filter: 'status = "approved"',
@@ -38,7 +38,11 @@ export default async function HomePage() {
       description: b.description,
       isFeatured: b.is_featured || false,
       isVerified: b.is_verified || false,
-      icon: b.logo ? `https://pb.britishlookup.co.uk/api/files/businesses/${b.id}/${b.logo}` : "",
+      banner: b.banner
+        ? `https://pb.britishlookup.co.uk/api/files/businesses/${b.id}/${b.banner}`
+        : b.logo
+          ? `https://pb.britishlookup.co.uk/api/files/businesses/${b.id}/${b.logo}`
+          : "",
     }));
   } catch (e) { console.error("PB query error:", e); }
 
