@@ -1,7 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { Button } from "@/components/ui/button";
+
+const TipTapEditor = lazy(() =>
+  import("@/components/ui/tiptap-editor").then((m) => ({ default: m.TipTapEditor }))
+);
 
 const inputClass = "w-full h-11 px-4 rounded-[var(--radius-btn)] border border-border bg-white text-text focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand";
 
@@ -13,6 +17,7 @@ export function SubmitArticleForm({ categories }: Props) {
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [errorMsg, setErrorMsg] = useState("");
+  const [body, setBody] = useState("");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -20,7 +25,13 @@ export function SubmitArticleForm({ categories }: Props) {
     setErrors({});
     setErrorMsg("");
 
+    if (!body || body === "<p></p>") {
+      setErrorMsg("Article content is required");
+      setStatus("error");
+      return;
+    }
     const form = new FormData(e.currentTarget);
+    form.set("body", body);
 
     try {
       const res = await fetch("/api/submit-article", { method: "POST", body: form });
@@ -79,7 +90,9 @@ export function SubmitArticleForm({ categories }: Props) {
 
       <div>
         <label className="block text-sm font-medium text-text mb-1.5">Article Content *</label>
-        <textarea name="body" required rows={10} className="w-full px-4 py-3 rounded-[var(--radius-btn)] border border-border bg-white text-text focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand resize-y min-h-[200px]" placeholder="Paste your article or a link to a Google Doc" />
+        <Suspense fallback={<div className="h-[250px] border border-border rounded-lg animate-pulse bg-gray-50" />}>
+          <TipTapEditor onChange={setBody} />
+        </Suspense>
         <FieldError errors={errors.body} />
       </div>
 
