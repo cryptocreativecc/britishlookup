@@ -47,7 +47,7 @@ export default async function HomePage() {
   } catch (e) { console.error("PB query error:", e); }
 
   // Fetch recent published articles
-  let articles: { title: string; slug: string; excerpt: string; category: string; authorName: string; readTime: number; publishedAt: string }[] = [];
+  let articles: { title: string; slug: string; excerpt: string; category: string; authorName: string; readTime: number; publishedAt: string; coverImage: string }[] = [];
   try {
     const result = await pb.collection("articles").getList(1, 3, {
       filter: 'status = "published"',
@@ -61,6 +61,7 @@ export default async function HomePage() {
       authorName: a.author_name || "",
       readTime: a.read_time || 3,
       publishedAt: a.published_at || a.created,
+      coverImage: a.cover_image ? `https://pb.britishlookup.co.uk/api/files/articles/${a.id}/${a.cover_image}` : "",
     }));
   } catch (e) { console.error("PB query error:", e); }
   return (

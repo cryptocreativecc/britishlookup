@@ -20,6 +20,7 @@ export default async function BlogPage() {
     authorName: string;
     readTime: number;
     publishedAt: string;
+    coverImage: string;
   }[] = [];
 
   try {
@@ -36,6 +37,7 @@ export default async function BlogPage() {
       authorName: a.author_name || "",
       readTime: a.read_time || 3,
       publishedAt: a.published_at || a.created,
+      coverImage: a.cover_image ? `https://pb.britishlookup.co.uk/api/files/articles/${a.id}/${a.cover_image}` : "",
     }));
   } catch { /* */ }
 

@@ -10,6 +10,7 @@ import { ImageGallery } from "@/components/directory/image-gallery";
 import { TeamMembers } from "@/components/directory/team-members";
 import { FAQDisplay } from "@/components/directory/faq-display";
 import { ListingMap } from "@/components/directory/listing-map";
+import { ArticleCard } from "@/components/blog/article-card";
 import { createAdminPb } from "@/lib/pb";
 import { listingMeta } from "@/lib/seo";
 import { notFound } from "next/navigation";
@@ -87,6 +88,21 @@ export default async function ListingPage({ params }: { params: Promise<{ slug: 
   const galleryImages = Array.isArray(biz.gallery)
     ? biz.gallery.map((f: string) => `https://pb.britishlookup.co.uk/api/files/businesses/${biz.id}/${f}`)
     : [];
+
+  // Fetch articles by business owner
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let ownerArticles: any[] = [];
+  if (biz.owner) {
+    try {
+      const artPb = await createAdminPb();
+      const arts = await artPb.collection("articles").getFullList({
+        filter: `author="${biz.owner}" && status="published"`,
+        sort: "-created",
+        expand: "category",
+      });
+      ownerArticles = arts;
+    } catch { /* */ }
+  }
   const hasSocials = Object.values(socialLinks).some((v) => !!v);
   const hasHours = Object.values(openingHours).some((d) => d?.isOpen);
 
@@ -197,6 +213,28 @@ export default async function ListingPage({ params }: { params: Promise<{ slug: 
 
             {/* Reviews */}
             <ReviewsSection businessId={biz.id} />
+
+            {/* Articles by owner */}
+            {ownerArticles.length > 0 && (
+              <div className="mt-8">
+                <h2 className="text-lg font-semibold text-text mb-3">Articles</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {ownerArticles.map((a) => (
+                    <ArticleCard
+                      key={a.id}
+                      title={a.title}
+                      slug={a.slug}
+                      excerpt={a.excerpt || a.body?.replace(/<[^>]*>/g, "").slice(0, 200) || ""}
+                      category={a.expand?.category?.name || ""}
+                      authorName={a.author_name || ""}
+                      readTime={a.read_time || 3}
+                      publishedAt={a.published_at || a.created}
+                      coverImage={a.cover_image ? `https://pb.britishlookup.co.uk/api/files/articles/${a.id}/${a.cover_image}` : ""}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Claim */}
             {!biz.claimed && (
