@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { createAdminPb } from "@/lib/pb";
 import { ReadingProgress } from "@/components/ui/reading-progress";
+import { SocialShare } from "@/components/blog/social-share";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
@@ -115,6 +116,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           </CardContent>
         </Card>
       )}
+      <SocialShare title={article.title} slug={article.slug} />
     </article>
     </>
   );
