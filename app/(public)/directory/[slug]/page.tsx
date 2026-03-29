@@ -57,15 +57,15 @@ export default async function ListingPage({
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="flex-1">
-          <div className="flex items-start gap-4">
+          <div className="flex items-center gap-4">
             {biz.logo ? (
               <img
                 src={`https://pb.britishlookup.co.uk/api/files/businesses/${biz.id}/${biz.logo}`}
                 alt={biz.name}
-                className="w-16 h-16 rounded-[var(--radius-card)] object-contain bg-white border border-border"
+                className="w-24 h-24 rounded-[var(--radius-card)] object-contain bg-white border border-border"
               />
             ) : (
-              <div className="w-16 h-16 rounded-[var(--radius-card)] bg-brand-light flex items-center justify-center text-brand font-bold text-2xl">
+              <div className="w-24 h-24 rounded-[var(--radius-card)] bg-brand-light flex items-center justify-center text-brand font-bold text-3xl">
                 {initial}
               </div>
             )}
