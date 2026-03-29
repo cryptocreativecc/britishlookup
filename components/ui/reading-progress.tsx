@@ -1,12 +1,15 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 
 export function ReadingProgress() {
   const [progress, setProgress] = useState(0);
-  const ref = useRef<HTMLDivElement>(null);
+  const [navHeight, setNavHeight] = useState(0);
 
   useEffect(() => {
+    const header = document.querySelector("header");
+    if (header) setNavHeight(header.offsetHeight);
+
     function handleScroll() {
       const scrollTop = window.scrollY;
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
@@ -17,8 +20,10 @@ export function ReadingProgress() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  if (!navHeight) return null;
+
   return (
-    <div ref={ref} className="sticky top-[57px] z-50 h-[3px] bg-transparent -mb-[3px]">
+    <div className="fixed left-0 w-full z-[49] h-[3px]" style={{ top: `${navHeight}px` }}>
       <div
         className="h-full bg-brand"
         style={{ width: `${progress}%` }}
