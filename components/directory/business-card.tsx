@@ -30,7 +30,7 @@ export function BusinessCard({
         <CardContent>
           <div className="flex items-start justify-between gap-2">
             {icon ? (
-              <img src={icon} alt={name} className="w-12 h-12 rounded-[var(--radius-btn)] object-contain bg-white border border-border shrink-0" />
+              <img src={icon} alt={name} className="w-12 h-12 p-1.5 rounded-[var(--radius-btn)] object-contain bg-white border border-border shrink-0" />
             ) : (
               <div className="w-12 h-12 rounded-[var(--radius-btn)] bg-brand-light flex items-center justify-center text-brand font-bold text-lg shrink-0">
                 {name.charAt(0)}
