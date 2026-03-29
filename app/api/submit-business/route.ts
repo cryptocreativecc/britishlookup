@@ -60,7 +60,15 @@ export async function POST(req: Request) {
 
     const data = parsed.data;
     const geo = await geocodePostcode(data.postcode);
-    const slug = slugify(data.name);
+    let slug = slugify(data.name);
+
+    // Ensure unique slug
+    const pb2 = await createAdminPb();
+    try {
+      await pb2.collection("businesses").getFirstListItem(`slug="${slug}"`);
+      // Slug exists — append random suffix
+      slug = `${slug}-${Date.now().toString(36).slice(-4)}`;
+    } catch { /* slug is unique */ }
     const tags = data.tags
       ? data.tags.split(",").map((t) => t.trim()).filter(Boolean)
       : [];
@@ -142,7 +150,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, message: "Business submitted for review" });
     }
   } catch (err) {
-    console.error("Submit business error:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    const errMsg = err instanceof Error ? err.message : String(err);
+    console.error("Submit business error:", errMsg, err);
+    if (errMsg.includes("unique") || errMsg.includes("slug")) {
+      return NextResponse.json({ error: "A business with this name already exists. Please use a different name." }, { status: 400 });
+    }
+    return NextResponse.json({ error: `Submission failed: ${errMsg}` }, { status: 500 });
   }
 }
