@@ -3,12 +3,14 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
-const CATEGORIES = ["Roofing", "Guttering", "Building", "Plumbing", "Electrical", "Painting", "Landscaping", "Joinery", "Carpentry", "Plastering", "Fencing", "Tiling", "Flooring", "Windows & Doors", "Heating", "Other"];
-const REGIONS = ["North West", "North East", "Yorkshire", "West Midlands", "East Midlands", "South East", "South West", "London", "East of England", "Scotland", "Wales", "Northern Ireland"];
-
 const inputClass = "w-full h-11 px-4 rounded-[var(--radius-btn)] border border-border bg-white text-text focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand";
 
-export function SubmitBusinessForm() {
+interface Props {
+  categories: { id: string; name: string }[];
+  regions: { id: string; name: string }[];
+}
+
+export function SubmitBusinessForm({ categories, regions }: Props) {
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [errorMsg, setErrorMsg] = useState("");
@@ -64,7 +66,7 @@ export function SubmitBusinessForm() {
           <label className="block text-sm font-medium text-text mb-1.5">Category *</label>
           <select name="category" required className={inputClass}>
             <option value="">Select a category</option>
-            {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+            {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
           <FieldError errors={errors.category} />
         </div>
@@ -72,7 +74,7 @@ export function SubmitBusinessForm() {
           <label className="block text-sm font-medium text-text mb-1.5">Region *</label>
           <select name="region" required className={inputClass}>
             <option value="">Select a region</option>
-            {REGIONS.map((r) => <option key={r} value={r}>{r}</option>)}
+            {regions.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
           </select>
           <FieldError errors={errors.region} />
         </div>
