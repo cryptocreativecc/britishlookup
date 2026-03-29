@@ -10,6 +10,7 @@ interface Props {
     name: string;
     email: string;
     role: string;
+    avatar?: string;
   };
 }
 
@@ -88,6 +89,25 @@ export function ProfileForm({ user }: Props) {
           {success && <div className="mb-4 rounded-lg bg-green-50 text-green-700 p-3 text-sm">Profile updated!</div>}
 
           <form onSubmit={handleProfile} className="space-y-4">
+            {/* Current avatar */}
+            <div className="flex items-center gap-4">
+              {user.avatar ? (
+                <img
+                  src={`https://pb.britishlookup.co.uk/api/files/users/${user.id}/${user.avatar}`}
+                  alt={user.name}
+                  className="w-16 h-16 rounded-full object-cover border border-border"
+                />
+              ) : (
+                <div className="w-16 h-16 rounded-full bg-brand-light flex items-center justify-center text-brand font-bold text-2xl">
+                  {(user.name || "U").charAt(0).toUpperCase()}
+                </div>
+              )}
+              <div>
+                <p className="font-medium text-text">{user.name || "No name set"}</p>
+                <p className="text-sm text-text-muted">{user.email}</p>
+              </div>
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-text mb-1.5">Name</label>
               <input name="name" defaultValue={user.name} required className={inputClass} />
