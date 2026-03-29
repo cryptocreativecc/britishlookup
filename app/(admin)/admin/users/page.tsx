@@ -1,5 +1,7 @@
 import { createAdminPb } from "@/lib/pb";
 import { Badge } from "@/components/ui/badge";
+import { UserRoleSelect } from "./user-role-select";
+import { UserDeleteButton } from "./user-delete-button";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Users — Admin" };
@@ -20,17 +22,11 @@ export default async function AdminUsersPage() {
     }));
   } catch { /* collection may not exist */ }
 
-  const roleColor: Record<string, string> = {
-    admin: "bg-purple-100 text-purple-800",
-    business_owner: "bg-blue-100 text-blue-800",
-    user: "bg-gray-100 text-gray-800",
-  };
-
   return (
     <div>
       <h1 className="text-2xl font-bold text-text mb-6">Users ({users.length})</h1>
 
-      <div className="bg-white rounded-lg border border-border overflow-hidden">
+      <div className="bg-white rounded-lg border border-border overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 border-b border-border">
             <tr>
@@ -39,6 +35,7 @@ export default async function AdminUsersPage() {
               <th className="text-left p-3 font-medium text-text-muted">Role</th>
               <th className="text-left p-3 font-medium text-text-muted">Status</th>
               <th className="text-left p-3 font-medium text-text-muted">Joined</th>
+              <th className="text-left p-3 font-medium text-text-muted">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -47,17 +44,20 @@ export default async function AdminUsersPage() {
                 <td className="p-3 font-medium text-text">{user.name || "—"}</td>
                 <td className="p-3 text-text-muted">{user.email}</td>
                 <td className="p-3">
-                  <Badge className={roleColor[user.role] || ""}>{user.role}</Badge>
+                  <UserRoleSelect userId={user.id} currentRole={user.role} />
                 </td>
                 <td className="p-3">
                   {user.verified ? (
-                    <span className="text-green-600 text-xs font-medium">Verified</span>
+                    <Badge className="bg-green-100 text-green-800">Verified</Badge>
                   ) : (
-                    <span className="text-yellow-600 text-xs font-medium">Unverified</span>
+                    <Badge className="bg-yellow-100 text-yellow-800">Unverified</Badge>
                   )}
                 </td>
                 <td className="p-3 text-text-muted">
                   {new Date(user.created).toLocaleDateString("en-GB")}
+                </td>
+                <td className="p-3">
+                  <UserDeleteButton userId={user.id} userName={user.name || user.email} />
                 </td>
               </tr>
             ))}

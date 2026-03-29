@@ -34,7 +34,8 @@ export function SearchBar({
           "w-full h-12 pl-11 pr-4 rounded-[var(--radius-card)] border border-border bg-white text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand transition-colors",
           className
         )}
-        placeholder="Search businesses, trades, services…"
+        name="q"
+        placeholder="Search businesses, categories, locations…"
         onChange={(e) => onSearch?.(e.target.value)}
         {...props}
       />

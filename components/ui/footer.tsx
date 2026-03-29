@@ -49,14 +49,14 @@ export function Footer() {
               Company
             </h4>
             <nav className="flex flex-col gap-2 text-sm text-gray-400">
+              <Link href="/about" className="hover:text-white transition-colors">
+                About
+              </Link>
+              <Link href="/contact" className="hover:text-white transition-colors">
+                Contact
+              </Link>
               <Link href="/blog" className="hover:text-white transition-colors">
                 Blog
-              </Link>
-              <Link href="/write-for-us" className="hover:text-white transition-colors">
-                Write For Us
-              </Link>
-              <Link href="/login" className="hover:text-white transition-colors">
-                Sign In
               </Link>
             </nav>
           </div>
