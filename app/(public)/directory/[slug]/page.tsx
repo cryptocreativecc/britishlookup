@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ClaimButton } from "@/components/directory/claim-button";
+import { ContactCard } from "@/components/directory/contact-card";
 import { ReviewsSection } from "@/components/directory/reviews-section";
 import { ApprovedSeal } from "@/components/ui/approved-seal";
 import { createAdminPb } from "@/lib/pb";
@@ -110,22 +111,14 @@ export default async function ListingPage({
         </div>
 
         <div className="lg:w-80 shrink-0 space-y-4">
-          <Card>
-            <CardContent>
-              <h3 className="font-semibold text-text mb-3">Contact Details</h3>
-              <div className="space-y-2 text-sm text-text-muted">
-                {biz.address && <p>📍 {biz.address}{biz.postcode ? `, ${biz.postcode}` : ""}</p>}
-                {!biz.address && biz.town && <p>📍 {biz.town}{biz.postcode ? `, ${biz.postcode}` : ""}</p>}
-                {biz.phone && <p>📞 {biz.phone}</p>}
-                {biz.email && <p>✉️ {biz.email}</p>}
-              </div>
-              {biz.website && (
-                <a href={biz.website} target="_blank" rel="noopener noreferrer" className="mt-4 block">
-                  <Button className="w-full">Visit Website</Button>
-                </a>
-              )}
-            </CardContent>
-          </Card>
+          <ContactCard
+            address={biz.address}
+            town={biz.town}
+            postcode={biz.postcode}
+            phone={biz.phone}
+            email={biz.email}
+            website={biz.website}
+          />
 
           {tags.length > 0 && (
             <Card>
