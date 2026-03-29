@@ -1,19 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
 const inputClass = "w-full h-11 px-4 rounded-[var(--radius-btn)] border border-border bg-white text-text focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand";
 
-interface Props {
-  categories: { id: string; name: string }[];
-  regions: { id: string; name: string }[];
-}
-
-export function SubmitBusinessForm({ categories, regions }: Props) {
+export function SubmitBusinessForm() {
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [errorMsg, setErrorMsg] = useState("");
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
+  const [regions, setRegions] = useState<{ id: string; name: string }[]>([]);
+  const [category, setCategory] = useState("");
+  const [region, setRegion] = useState("");
+
+  useEffect(() => {
+    fetch("/api/lookup/categories").then(r => r.json()).then(d => setCategories(d)).catch(() => {});
+    fetch("/api/lookup/regions").then(r => r.json()).then(d => setRegions(d)).catch(() => {});
+  }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -21,14 +25,10 @@ export function SubmitBusinessForm({ categories, regions }: Props) {
     setErrors({});
     setErrorMsg("");
 
-    const formEl = e.currentTarget;
-    const form = new FormData(formEl);
-
-    // Ensure select values are captured (hydration safety)
-    formEl.querySelectorAll("select[name]").forEach((sel) => {
-      const s = sel as HTMLSelectElement;
-      if (s.name && s.value) form.set(s.name, s.value);
-    });
+    const form = new FormData(e.currentTarget);
+    // Explicitly set select values
+    form.set("category", category);
+    form.set("region", region);
 
     try {
       const res = await fetch("/api/submit-business", { method: "POST", body: form });
@@ -78,7 +78,12 @@ export function SubmitBusinessForm({ categories, regions }: Props) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div>
           <label className="block text-sm font-medium text-text mb-1.5">Category *</label>
-          <select name="category" required className={inputClass}>
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            required
+            className={inputClass}
+          >
             <option value="">Select a category</option>
             {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
@@ -86,7 +91,12 @@ export function SubmitBusinessForm({ categories, regions }: Props) {
         </div>
         <div>
           <label className="block text-sm font-medium text-text mb-1.5">Region *</label>
-          <select name="region" required className={inputClass}>
+          <select
+            value={region}
+            onChange={(e) => setRegion(e.target.value)}
+            required
+            className={inputClass}
+          >
             <option value="">Select a region</option>
             {regions.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
           </select>
@@ -114,7 +124,7 @@ export function SubmitBusinessForm({ categories, regions }: Props) {
         <FieldError errors={errors.description} />
       </div>
 
-      <Field label="Tags" name="tags" placeholder="roofing, flat roof, repairs (comma-separated)" errors={errors.tags} />
+      <Field label="Tags" name="tags" placeholder="web design, branding, Wigan (comma-separated)" errors={errors.tags} />
 
       <div>
         <label className="block text-sm font-medium text-text mb-1.5">Logo Upload</label>

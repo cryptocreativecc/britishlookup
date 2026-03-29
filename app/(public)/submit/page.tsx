@@ -1,23 +1,13 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { SubmitBusinessForm } from "@/components/forms/submit-business-form";
-import { createAdminPb } from "@/lib/pb";
 import type { Metadata } from "next";
 
-export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Submit Your Business — Get Listed on BritishLookup",
   description: "Add your business to BritishLookup for free. Get a verified listing with a dofollow backlink to your website.",
 };
 
-export default async function SubmitPage() {
-  const pb = await createAdminPb();
-  const [cats, regs] = await Promise.all([
-    pb.collection("categories").getFullList({ sort: "name" }),
-    pb.collection("regions").getFullList({ sort: "name" }),
-  ]);
-  const categories = cats.map((c) => ({ id: c.id, name: c.name }));
-  const regions = regs.map((r) => ({ id: r.id, name: r.name }));
-
+export default function SubmitPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <h1 className="text-3xl sm:text-4xl font-bold text-text">Submit Your Business</h1>
@@ -28,7 +18,7 @@ export default async function SubmitPage() {
 
       <Card className="mt-8">
         <CardContent>
-          <SubmitBusinessForm categories={categories} regions={regions} />
+          <SubmitBusinessForm />
         </CardContent>
       </Card>
     </div>

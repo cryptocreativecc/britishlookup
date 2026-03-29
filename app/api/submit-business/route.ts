@@ -36,6 +36,9 @@ export async function POST(req: Request) {
     const formData = await req.formData();
 
     const fields: Record<string, string> = {};
+    // Ensure all expected fields have at least empty string (prevents "received undefined")
+    const expectedFields = ["name", "category", "region", "town", "postcode", "address", "phone", "email", "website", "description", "tags"];
+    for (const f of expectedFields) fields[f] = "";
     for (const [key, value] of formData.entries()) {
       if (typeof value === "string") fields[key] = value;
     }
