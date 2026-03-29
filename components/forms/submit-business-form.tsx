@@ -55,7 +55,14 @@ export function SubmitBusinessForm({ categories, regions }: Props) {
     <form onSubmit={handleSubmit} className="space-y-5">
       {errorMsg && (
         <div className="bg-red-50 text-red-700 text-sm p-3 rounded-[var(--radius-btn)]">
-          {errorMsg}
+          <p className="font-medium">{errorMsg}</p>
+          {Object.keys(errors).length > 0 && (
+            <ul className="mt-1 list-disc list-inside text-xs">
+              {Object.entries(errors).map(([field, msgs]) => (
+                <li key={field}><strong>{field}:</strong> {msgs.join(", ")}</li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
 
@@ -92,7 +99,7 @@ export function SubmitBusinessForm({ categories, regions }: Props) {
         <Field label="Email Address" name="email" type="email" required errors={errors.email} />
       </div>
 
-      <Field label="Website URL" name="website" type="url" required placeholder="https://example.com" errors={errors.website} />
+      <Field label="Website URL" name="website" type="url" placeholder="https://example.com" errors={errors.website} />
 
       <div>
         <label className="block text-sm font-medium text-text mb-1.5">Business Description *</label>

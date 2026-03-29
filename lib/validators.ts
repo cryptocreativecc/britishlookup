@@ -8,12 +8,12 @@ export const businessSchema = z.object({
   region: z.string().min(1, "Region is required"),
   town: z.string().min(1, "Town is required").max(100),
   postcode: z.string().regex(UK_POSTCODE, "Enter a valid UK postcode"),
-  address: z.string().max(300).optional(),
-  phone: z.string().max(20).optional(),
+  address: z.string().max(300).optional().or(z.literal("")),
+  phone: z.string().max(20).optional().or(z.literal("")),
   email: z.string().email("Enter a valid email address"),
-  website: z.string().url("Enter a valid URL").startsWith("http", "URL must start with http"),
+  website: z.string().url("Enter a valid URL").or(z.literal("")),
   description: z.string().min(20, "Description must be at least 20 characters").max(1200),
-  tags: z.string().max(500).optional(),
+  tags: z.string().max(500).optional().or(z.literal("")),
 });
 
 export const articleSchema = z.object({
