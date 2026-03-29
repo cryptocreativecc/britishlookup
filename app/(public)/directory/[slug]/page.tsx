@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ClaimButton } from "@/components/directory/claim-button";
 import { ReviewsSection } from "@/components/directory/reviews-section";
+import { ApprovedSeal } from "@/components/ui/approved-seal";
 import { createAdminPb } from "@/lib/pb";
 import { listingMeta } from "@/lib/seo";
 import { notFound } from "next/navigation";
@@ -71,7 +72,10 @@ export default async function ListingPage({
               </div>
             )}
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-text">{biz.name}</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-text flex items-center gap-2">
+                {biz.name}
+                <ApprovedSeal className="w-6 h-6 text-brand shrink-0" />
+              </h1>
               <div className="mt-1 flex flex-wrap items-center gap-2">
                 {categoryName && <Badge variant="brand">{categoryName}</Badge>}
                 {biz.is_verified && <Badge variant="outline">✓ Verified</Badge>}

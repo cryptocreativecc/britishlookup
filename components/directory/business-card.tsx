@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ApprovedSeal } from "@/components/ui/approved-seal";
 
 interface BusinessCardProps {
   name: string;
@@ -34,7 +35,10 @@ export function BusinessCard({
               {isVerified && <Badge variant="outline">✓ Verified</Badge>}
             </div>
           </div>
-          <h3 className="mt-3 font-semibold text-text line-clamp-1">{name}</h3>
+          <h3 className="mt-3 font-semibold text-text line-clamp-1 flex items-center gap-1.5">
+            {name}
+            <ApprovedSeal className="w-5 h-5 text-brand shrink-0" />
+          </h3>
           <p className="text-sm text-text-muted mt-0.5">
             {category} · {town}
           </p>
