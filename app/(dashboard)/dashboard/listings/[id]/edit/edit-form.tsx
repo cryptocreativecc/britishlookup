@@ -54,8 +54,8 @@ export function EditListingForm({ listing, categories, regions }: Props) {
     for (const [day, d] of Object.entries(raw)) {
       if (base[day]) {
         base[day] = {
-          enabled: d.enabled !== undefined ? !!d.enabled : d.closed !== undefined ? !d.closed : false,
-          is24h: !!(d.is24h ?? d.is24),
+          closed: d.closed !== undefined ? !!d.closed : d.enabled !== undefined ? !d.enabled : true,
+          is24: !!(d.is24 ?? d.is24h),
           slots: Array.isArray(d.slots) ? d.slots as { open: string; close: string }[] : [{ open: "09:00", close: "17:00" }],
         };
       }

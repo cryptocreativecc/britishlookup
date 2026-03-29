@@ -69,16 +69,16 @@ export default async function ListingPage({ params }: { params: Promise<{ slug: 
   // Normalise: support both {enabled,is24h} and {closed,is24} shapes
   const openingHours = Object.fromEntries(
     Object.entries(rawHours).map(([day, d]) => {
-      const enabled = d.enabled !== undefined ? !!d.enabled : d.closed !== undefined ? !d.closed : false;
-      const is24h = !!(d.is24h ?? d.is24);
+      const isOpen = d.enabled !== undefined ? !!d.enabled : d.closed !== undefined ? !d.closed : false;
+      const is24 = !!(d.is24h ?? d.is24);
       const slots = (Array.isArray(d.slots) ? d.slots : [{ open: "09:00", close: "17:00" }]) as { open: string; close: string }[];
-      return [day, { enabled, is24h, slots }];
+      return [day, { isOpen, is24, slots }];
     })
   );
   const socialLinks = parseJSON<Record<string, string>>(biz.social_links, {});
   const amenities = parseJSON<string[]>(biz.amenities, []);
   const hasSocials = Object.values(socialLinks).some((v) => !!v);
-  const hasHours = Object.values(openingHours).some((d) => d?.enabled);
+  const hasHours = Object.values(openingHours).some((d) => d?.isOpen);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -195,7 +195,7 @@ export default async function ListingPage({ params }: { params: Promise<{ slug: 
                     {DAYS.map((day) => {
                       const d = openingHours[day];
                       const isToday = day === today;
-                      if (!d?.enabled) {
+                      if (!d?.isOpen) {
                         return (
                           <div key={day} className={`flex justify-between ${isToday ? "font-semibold text-brand" : "text-text-muted"}`}>
                             <span>{day}</span>
@@ -206,7 +206,7 @@ export default async function ListingPage({ params }: { params: Promise<{ slug: 
                       return (
                         <div key={day} className={`flex justify-between ${isToday ? "font-semibold text-brand" : "text-text"}`}>
                           <span>{day}</span>
-                          <span>{d.is24h ? "24 hours" : d.slots?.map((s) => `${s.open}–${s.close}`).join(", ")}</span>
+                          <span>{d.is24 ? "24 hours" : d.slots?.map((s) => `${s.open}–${s.close}`).join(", ")}</span>
                         </div>
                       );
                     })}
