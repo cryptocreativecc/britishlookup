@@ -3,11 +3,13 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
-const CATEGORIES = ["Roofing", "Guttering", "Building", "Business", "Trades Tips", "Home Improvement"];
-
 const inputClass = "w-full h-11 px-4 rounded-[var(--radius-btn)] border border-border bg-white text-text focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand";
 
-export function SubmitArticleForm() {
+interface Props {
+  categories: { id: string; name: string }[];
+}
+
+export function SubmitArticleForm({ categories }: Props) {
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [errorMsg, setErrorMsg] = useState("");
@@ -70,7 +72,7 @@ export function SubmitArticleForm() {
         <label className="block text-sm font-medium text-text mb-1.5">Category *</label>
         <select name="category" required className={inputClass}>
           <option value="">Select a category</option>
-          {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+          {categories.map((c) => <option key={c.id} value={c.name}>{c.name}</option>)}
         </select>
         <FieldError errors={errors.category} />
       </div>
