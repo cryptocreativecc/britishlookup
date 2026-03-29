@@ -24,7 +24,7 @@ export const articleSchema = z.object({
   author_name: z.string().min(2, "Name is required").max(100),
   email: z.string().email("Enter a valid email address"),
   author_company: z.string().max(100).optional(),
-  author_website: z.string().url("Enter a valid URL").startsWith("http"),
+  author_website: z.string().url("Enter a valid URL").startsWith("http").or(z.literal("")).optional(),
   title: z.string().min(5, "Article title is required").max(200),
   category: z.string().min(1, "Category is required"),
   body: z.string().min(100, "Article must be at least 100 characters"),

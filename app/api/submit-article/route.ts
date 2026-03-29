@@ -42,18 +42,27 @@ export async function POST(req: Request) {
     const pb = await createAdminPb();
     const user = await getLoggedInUser();
 
+    // Resolve category name to ID
+    let categoryId = "";
+    if (data.category) {
+      try {
+        const cats = await pb.collection("categories").getFullList({ filter: `name="${data.category}"` });
+        if (cats.length > 0) categoryId = cats[0].id;
+      } catch {}
+    }
+
     if (user) {
       // Logged-in user: create directly in articles with author link
       const record = await pb.collection("articles").create({
         title: data.title,
         slug,
         body: data.body,
-        excerpt: data.body.slice(0, 300).trim(),
-        category: data.category || "",
+        excerpt: data.body.replace(/<[^>]*>/g, "").slice(0, 300).trim(),
+        category: categoryId || undefined,
         author: user.id,
         author_name: user.name || data.author_name,
         author_bio: data.author_bio || "",
-        author_website: data.author_website || "",
+        author_website: data.author_website || undefined,
         author_company: data.author_company || "",
         read_time: readTime,
         status: "pending",
@@ -73,11 +82,11 @@ export async function POST(req: Request) {
         title: data.title,
         slug,
         body: data.body,
-        excerpt: data.body.slice(0, 300).trim(),
-        category: data.category || "",
+        excerpt: data.body.replace(/<[^>]*>/g, "").slice(0, 300).trim(),
+        category: categoryId || undefined,
         author_name: data.author_name,
         author_bio: data.author_bio || "",
-        author_website: data.author_website || "",
+        author_website: data.author_website || undefined,
         author_company: data.author_company || "",
         email: data.email,
         read_time: readTime,
