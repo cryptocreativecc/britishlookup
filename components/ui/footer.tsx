@@ -24,7 +24,7 @@ export function Footer() {
               <img
                 src="/British-Lookup-Logo-Secondary.svg"
                 alt="British Lookup"
-                className="h-10 w-auto"
+                className="w-[278px] h-auto"
               />
             </Link>
             <p className="mt-3 text-sm text-gray-400 leading-relaxed">

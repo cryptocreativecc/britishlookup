@@ -24,7 +24,7 @@ export function NavBar() {
             <img
               src="/British-Lookup-Logo-Original.svg"
               alt="British Lookup"
-              className="h-10 w-auto"
+              className="w-[278px] h-auto"
             />
           </Link>
 
