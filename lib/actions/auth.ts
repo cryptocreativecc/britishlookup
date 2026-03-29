@@ -37,7 +37,8 @@ export async function loginAction(formData: FormData): Promise<ActionResult> {
     console.error("Login failed:", email, e);
     return { error: "Invalid email or password." };
   }
-  redirect("/dashboard");
+  const callbackUrl = (formData.get("callbackUrl") as string) || "/dashboard";
+  redirect(callbackUrl);
 }
 
 export async function registerAction(formData: FormData): Promise<ActionResult> {

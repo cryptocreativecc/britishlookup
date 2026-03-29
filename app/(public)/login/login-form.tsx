@@ -14,6 +14,7 @@ export function LoginForm() {
   const [resendSent, setResendSent] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
   const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
   const verified = searchParams.get("verified") === "true";
   const resetDone = searchParams.get("reset") === "true";
   const tokenError = searchParams.get("error") === "invalid-token";
@@ -68,6 +69,7 @@ export function LoginForm() {
           )}
 
           <form action={handleSubmit} className="space-y-4">
+            <input type="hidden" name="callbackUrl" value={callbackUrl} />
             <div>
               <label className="block text-sm font-medium text-text mb-1.5">Email</label>
               <input
@@ -115,7 +117,7 @@ export function LoginForm() {
           <div className="mt-4 text-center text-sm text-text-muted">
             <Link href="/reset-password" className="hover:text-brand">Forgot password?</Link>
             {" · "}
-            <Link href="/register" className="hover:text-brand">Create account</Link>
+            <Link href={`/register${callbackUrl !== "/dashboard" ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : ""}`} className="hover:text-brand">Create account</Link>
           </div>
         </CardContent>
       </Card>

@@ -20,9 +20,17 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // Submit / Write For Us require auth
+  if ((pathname === "/submit" || pathname === "/write-for-us") && !token) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    url.searchParams.set("callbackUrl", pathname);
+    return NextResponse.redirect(url);
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/dashboard/:path*"],
+  matcher: ["/admin/:path*", "/dashboard/:path*", "/submit", "/write-for-us"],
 };
