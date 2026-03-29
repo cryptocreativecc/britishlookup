@@ -19,7 +19,7 @@ export function NavBar() {
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2 my-4">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/British-Lookup-Logo-Original.svg"
