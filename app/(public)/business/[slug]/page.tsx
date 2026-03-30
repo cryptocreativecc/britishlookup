@@ -101,7 +101,7 @@ export default async function ListingPage({ params }: { params: Promise<{ slug: 
         expand: "category",
       });
       ownerArticles = arts;
-    } catch { /* */ }
+    } catch (e) { console.error("Owner articles fetch error:", e); }
   }
   const hasSocials = Object.values(socialLinks).some((v) => !!v);
   const hasHours = Object.values(openingHours).some((d) => d?.isOpen);
