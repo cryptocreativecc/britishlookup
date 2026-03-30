@@ -12,45 +12,46 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/write-for-us`, changeFrequency: "monthly", priority: 0.6 },
     { url: `${BASE}/about`, changeFrequency: "monthly", priority: 0.4 },
     { url: `${BASE}/contact`, changeFrequency: "monthly", priority: 0.4 },
-    { url: `${BASE}/privacy`, changeFrequency: "yearly", priority: 0.2 },
-    { url: `${BASE}/terms`, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${BASE}/privacy`, changeFrequency: "monthly", priority: 0.2 },
+    { url: `${BASE}/terms`, changeFrequency: "monthly", priority: 0.2 },
   ];
+
+  let businessRoutes: MetadataRoute.Sitemap = [];
+  let articleRoutes: MetadataRoute.Sitemap = [];
+  let categoryRoutes: MetadataRoute.Sitemap = [];
 
   try {
     const pb = await createAdminPb();
 
-    // Categories
-    const categories = await pb.collection("categories").getFullList();
-    const categoryRoutes: MetadataRoute.Sitemap = categories.map((c) => ({
-      url: `${BASE}/categories/${c.slug}`,
-      changeFrequency: "weekly",
-      priority: 0.8,
-    }));
-
-    // Businesses
     const businesses = await pb.collection("businesses").getFullList({
       filter: 'status="approved" || status="featured"',
+      fields: "slug,updated,is_featured",
     });
-    const businessRoutes: MetadataRoute.Sitemap = businesses.map((b) => ({
+    businessRoutes = businesses.map((b) => ({
       url: `${BASE}/business/${b.slug}`,
       lastModified: new Date(b.updated),
-      changeFrequency: "weekly",
+      changeFrequency: "weekly" as const,
       priority: b.is_featured ? 0.9 : 0.7,
     }));
 
-    // Articles
     const articles = await pb.collection("articles").getFullList({
       filter: 'status="published"',
+      fields: "slug,updated",
     });
-    const articleRoutes: MetadataRoute.Sitemap = articles.map((a) => ({
+    articleRoutes = articles.map((a) => ({
       url: `${BASE}/guides/${a.slug}`,
       lastModified: new Date(a.updated),
-      changeFrequency: "monthly",
+      changeFrequency: "monthly" as const,
       priority: 0.7,
     }));
 
-    return [...staticRoutes, ...categoryRoutes, ...businessRoutes, ...articleRoutes];
-  } catch {
-    return staticRoutes;
-  }
+    const categories = await pb.collection("categories").getFullList({ fields: "slug" });
+    categoryRoutes = categories.map((c) => ({
+      url: `${BASE}/categories/${c.slug}`,
+      changeFrequency: "weekly" as const,
+      priority: 0.6,
+    }));
+  } catch {}
+
+  return [...staticRoutes, ...businessRoutes, ...articleRoutes, ...categoryRoutes];
 }

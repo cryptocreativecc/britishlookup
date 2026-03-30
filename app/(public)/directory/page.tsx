@@ -7,8 +7,9 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Business Directory — Find UK Businesses",
+  title: "UK Business Directory — Browse All Businesses | British Lookup",
   description: "Browse UK businesses across every industry and region. Find trusted local services, from tradespeople to restaurants, tech companies to wedding venues.",
+  alternates: { canonical: "https://britishlookup.co.uk/directory" },
 };
 
 export default async function DirectoryPage({
