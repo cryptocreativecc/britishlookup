@@ -93,6 +93,7 @@ export default async function ListingPage({ params }: { params: Promise<{ slug: 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let ownerArticles: any[] = [];
   if (biz.owner) {
+    console.log("[listing] Fetching articles for owner:", biz.owner);
     try {
       const artPb = await createAdminPb();
       const arts = await artPb.collection("articles").getFullList({
@@ -100,8 +101,11 @@ export default async function ListingPage({ params }: { params: Promise<{ slug: 
         sort: "-created",
         expand: "category",
       });
+      console.log("[listing] Found articles:", arts.length);
       ownerArticles = arts;
-    } catch (e) { console.error("Owner articles fetch error:", e); }
+    } catch (e) { console.error("[listing] Owner articles fetch error:", e); }
+  } else {
+    console.log("[listing] No owner on business, skipping articles");
   }
   const hasSocials = Object.values(socialLinks).some((v) => !!v);
   const hasHours = Object.values(openingHours).some((d) => d?.isOpen);
