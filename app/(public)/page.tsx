@@ -14,7 +14,6 @@ const STATIC_STATS = [
   { label: "Business Categories", value: "49" },
   { label: "UK Regions Covered", value: "53" },
   { label: "Free to List", value: "100%" },
-  { label: "Dofollow Backlinks", value: "✓" },
 ];
 
 export const dynamic = "force-dynamic";
