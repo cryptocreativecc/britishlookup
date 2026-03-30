@@ -32,7 +32,7 @@ export function localBusinessJsonLd(biz: Business) {
     "@type": "LocalBusiness",
     name: biz.name,
     description: biz.description,
-    url: `${BASE}/directory/${biz.slug}`,
+    url: `${BASE}/business/${biz.slug}`,
     telephone: biz.phone || undefined,
     address: {
       "@type": "PostalAddress",
@@ -62,7 +62,7 @@ export function articleJsonLd(article: Article) {
     "@type": "Article",
     headline: article.title,
     description: article.excerpt,
-    url: `${BASE}/blog/${article.slug}`,
+    url: `${BASE}/guides/${article.slug}`,
     datePublished: article.published_at,
     author: {
       "@type": "Person",

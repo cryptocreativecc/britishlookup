@@ -178,7 +178,7 @@ export default async function HomePage() {
               </p>
             </div>
             <Link
-              href="/blog"
+              href="/guides"
               className="hidden sm:inline-flex text-sm font-semibold text-brand hover:text-brand-dark transition-colors"
             >
               Read more →

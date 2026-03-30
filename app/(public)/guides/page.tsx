@@ -5,8 +5,8 @@ import type { Metadata } from "next";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Blog — Business Guides & Insights",
-  description: "Guides, tips, and expert insights for UK businesses and consumers. Written by industry professionals.",
+  title: "Business Guides & Expert Insights | British Lookup Guides",
+  description: "Expert guides, tips, and insights for UK businesses and consumers. Written by industry professionals to help you make better decisions.",
 };
 
 export default async function BlogPage() {
@@ -43,7 +43,7 @@ export default async function BlogPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <h1 className="text-3xl sm:text-4xl font-bold text-text">Blog</h1>
+      <h1 className="text-3xl sm:text-4xl font-bold text-text">Guides</h1>
       <p className="mt-2 text-text-muted">
         Guides, tips, and expert insights for UK businesses and consumers
       </p>

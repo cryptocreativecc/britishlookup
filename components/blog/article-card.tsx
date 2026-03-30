@@ -24,7 +24,7 @@ export function ArticleCard({
   coverImage,
 }: ArticleCardProps) {
   return (
-    <Link href={`/blog/${slug}`}>
+    <Link href={`/guides/${slug}`}>
       <Card className="h-full hover:border-brand/30 overflow-hidden">
         {coverImage ? (
           <div className="h-44 overflow-hidden">

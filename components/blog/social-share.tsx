@@ -6,7 +6,7 @@ interface Props {
 }
 
 export function SocialShare({ title, slug }: Props) {
-  const url = `https://britishlookup.co.uk/blog/${slug}`;
+  const url = `https://britishlookup.co.uk/guides/${slug}`;
   const encoded = encodeURIComponent(url);
   const encodedTitle = encodeURIComponent(title);
 

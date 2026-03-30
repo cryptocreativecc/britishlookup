@@ -26,7 +26,7 @@ export function BusinessCard({
   banner,
 }: BusinessCardProps) {
   return (
-    <Link href={`/directory/${slug}`}>
+    <Link href={`/business/${slug}`}>
       <Card className="h-full hover:border-brand/30 overflow-hidden">
         {banner ? (
           <div className="w-full h-40 bg-white border-b border-border flex items-center justify-center p-4">

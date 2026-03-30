@@ -55,7 +55,7 @@ export function Footer() {
               <Link href="/directory" className="hover:text-white transition-colors">
                 Browse All
               </Link>
-              <Link href="/category/trades-services" className="hover:text-white transition-colors">
+              <Link href="/categories/trades-services" className="hover:text-white transition-colors">
                 Categories
               </Link>
               <Link href="/submit" className="hover:text-white transition-colors">
@@ -76,8 +76,8 @@ export function Footer() {
               <Link href="/contact" className="hover:text-white transition-colors">
                 Contact
               </Link>
-              <Link href="/blog" className="hover:text-white transition-colors">
-                Blog
+              <Link href="/guides" className="hover:text-white transition-colors">
+                Guides
               </Link>
               <Link href="/write-for-us" className="hover:text-white transition-colors">
                 Write For Us

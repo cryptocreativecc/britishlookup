@@ -119,7 +119,7 @@ export default async function ListingPage({ params }: { params: Promise<{ slug: 
       address: { "@type": "PostalAddress", ...(biz.address ? { streetAddress: biz.address } : {}), ...(biz.town ? { addressLocality: biz.town } : {}), ...(biz.postcode ? { postalCode: biz.postcode } : {}), addressCountry: "GB" },
     } : {}),
     ...(biz.lat && biz.lng ? { geo: { "@type": "GeoCoordinates", latitude: biz.lat, longitude: biz.lng } } : {}),
-    "@id": `${siteUrl}/directory/${biz.slug}`,
+    "@id": `${siteUrl}/business/${biz.slug}`,
   };
 
   const today = new Date().toLocaleDateString("en-GB", { weekday: "long" });

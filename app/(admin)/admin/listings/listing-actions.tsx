@@ -25,7 +25,7 @@ export function ListingActions({ id, slug, currentStatus }: { id: string; slug: 
   return (
     <div className="flex gap-1">
       {slug && (
-        <Link href={`/directory/${slug}`} target="_blank">
+        <Link href={`/business/${slug}`} target="_blank">
           <Button size="sm" variant="outline" title="Preview">👁</Button>
         </Link>
       )}

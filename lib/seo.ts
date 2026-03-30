@@ -8,7 +8,7 @@ const DEFAULT_DESC =
 export const baseMetadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: `${SITE_NAME} — Free UK Business Directory`,
+    default: "British Lookup — Find Local Businesses Across the UK",
     template: `%s | ${SITE_NAME}`,
   },
   description: DEFAULT_DESC,
@@ -47,11 +47,11 @@ export function listingMeta(listing: {
   slug: string;
   logo_url?: string;
 }): Metadata {
-  const title = `${listing.name} — ${listing.category} in ${listing.town}`;
+  const title = `${listing.name} — ${listing.category} in ${listing.town} | British Lookup`;
   return {
     title,
     description: listing.description,
-    alternates: { canonical: `${BASE_URL}/directory/${listing.slug}` },
+    alternates: { canonical: `${BASE_URL}/business/${listing.slug}` },
     openGraph: {
       title: listing.name,
       description: listing.description,
@@ -69,7 +69,7 @@ export function articleMeta(article: {
   return {
     title: article.title,
     description: article.excerpt,
-    alternates: { canonical: `${BASE_URL}/blog/${article.slug}` },
+    alternates: { canonical: `${BASE_URL}/guides/${article.slug}` },
     openGraph: {
       title: article.title,
       description: article.excerpt,

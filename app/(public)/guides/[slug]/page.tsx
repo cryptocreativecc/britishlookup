@@ -13,11 +13,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   try {
     const article = await pb.collection("articles").getFirstListItem(`slug="${slug}"`, { expand: "category" });
     return {
-      title: article.seo_title || `${article.title} — BritishLookup Blog`,
+      title: article.seo_title || `${article.title} — British Lookup Guides`,
       description: article.seo_description || article.excerpt || article.body?.replace(/<[^>]*>/g, "").slice(0, 160),
     };
   } catch {
-    return { title: "Article — BritishLookup Blog" };
+    return { title: "Article — British Lookup Guides" };
   }
 }
 
@@ -96,7 +96,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                   {authorBusiness && (
                     <>
                       <span className="text-text-muted">@</span>
-                      <a href={`/directory/${authorBusiness.slug}`} className="font-semibold text-brand hover:text-brand-dark">
+                      <a href={`/business/${authorBusiness.slug}`} className="font-semibold text-brand hover:text-brand-dark">
                         {authorBusiness.name}
                       </a>
                     </>
